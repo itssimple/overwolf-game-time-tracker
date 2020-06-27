@@ -4,7 +4,7 @@ Yet another time tracking app for Overwolf!
 .. no but seriously, we'll try and track all time you spend in games and give you some sweet stats for it. :)
 
 ## Planned features
-- Track each session of each game
+- Track each session of each game (supported by Overwolf, will try to add support for other games as well!)
 - Give you stats on what game you play the most
 - Keep track of APM/KPM for each session
 - Be able to go back and compare sessions with each other

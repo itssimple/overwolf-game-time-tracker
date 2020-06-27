@@ -1,0 +1,46 @@
+{
+    "manifest_version": 1,
+    "type": "WebApp",
+    "meta": {
+        "name": "Game Time Tracker",
+        "description": "This application enables you to track how much time you spend in your games and what APM/KPM you have throughout your sessions. Features pretty graphs and tasty stats!",
+        "version": "1.0.0",
+        "author": "NoLifeKing85",
+        "minimum-overwolf-version": "0.120.0",
+        "icon": "resources/images/logo.png",
+        "icon_gray": "resources/images/logo_bw.png",
+        "window_icon": "resources/images/logo.png",
+        "splash_image": "resources/images/splash.png"
+    },
+    "permissions": [
+        "GameInfo"
+    ],
+    "data": {
+        "game_targeting": {
+            "type": "all"
+        },
+        "start_window": "background",
+        "windows": {
+            "background": {
+                "file": "windows/background-window.html",
+                "show_in_taskbar": false,
+                "is_background_page": true
+            },
+            "mainWindow": {
+                "file": "windows/main-window.html",
+                "show_in_taskbar": true,
+                "is_background_page": false
+            }
+        },
+        "launch_events": [
+            {
+                 "event" : "LaunchWithOverwolf"
+            }
+        ],
+        "developer": {
+            "enable_auto_refresh": true,
+            "reload_delay": 1000,
+            "filter": "*.*"
+        }
+    }
+}
