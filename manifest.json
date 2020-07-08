@@ -12,9 +12,7 @@
         "window_icon": "resources/images/logo.png",
         "splash_image": "resources/images/splash.png"
     },
-    "permissions": [
-        "GameInfo"
-    ],
+    "permissions": ["GameInfo", "Extensions"],
     "data": {
         "game_targeting": {
             "type": "all"
@@ -24,17 +22,25 @@
             "background": {
                 "file": "windows/background-window.html",
                 "show_in_taskbar": false,
-                "is_background_page": true
+                "is_background_page": true,
+                "background_optimization": false,
+                "block_top_window_navigation": true
             },
             "mainWindow": {
                 "file": "windows/main-window.html",
                 "show_in_taskbar": true,
-                "is_background_page": false
+                "is_background_page": false,
+                "block_top_window_navigation": true,
+                "desktop_only": true,
+                "transparent": false,
+                "show_minimize": true,
+                "show_maximize": true,
+                "resizable": true
             }
         },
         "launch_events": [
             {
-                 "event" : "LaunchWithOverwolf"
+                "event": "LaunchWithOverwolf"
             }
         ],
         "developer": {
