@@ -1,9 +1,5 @@
 body {
-  margin: 0;
-  padding: 0;
-  background-color: #414141;
-  color: #cfcfcf;
-  font-family: "Open Sans", sans-serif;
+  height: 100vh;
 }
 
 .desktop {
@@ -12,8 +8,6 @@ body {
 }
 
 .statsColumn {
-  background-color: #575757;
-  border-left: 1px solid #c9c9c9;
   margin-left: 10px;
   padding: 5px;
   padding-left: 10px;
@@ -28,10 +22,6 @@ body {
   align-items: center;
   padding: 5px;
   border-bottom: 1px solid #c9c9c9;
-}
-
-.summaryRow #weekSummaryText {
-  font-size: 24px;
 }
 
 .summaryRow #weekSummaryGraph {
@@ -58,32 +48,5 @@ body {
 }
 
 .last10Sessions {
-  padding: 5px;
-}
-
-.smallHeader {
-  font-size: 20px;
-}
-
-.last10Sessions .sessionTable {
-  margin-top: 10px;
-  width: 100%;
-  background-color: #575757;
-  color: rgb(240, 240, 240);
-  border-collapse: collapse;
-}
-
-.last10Sessions .sessionTable table,
-.last10Sessions .sessionTable th,
-.last10Sessions .sessionTable td {
-  border: 1px solid #fff;
-}
-
-.last10Sessions .sessionTable th,
-.last10Sessions .sessionTable td {
-  padding: 5px;
-}
-
-.last10Sessions .sessionTable th {
-  text-align: left;
+  margin-top: 5px;
 }
