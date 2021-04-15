@@ -34,6 +34,7 @@
         "grab_focus_on_desktop": true,
         "desktop_only": true,
         "transparent": false,
+        "native_window": false,
         "show_minimize": true,
         "show_maximize": false,
         "resizable": false,
