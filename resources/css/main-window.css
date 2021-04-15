@@ -1,6 +1,89 @@
 body {
-    margin: 0;
-    padding: 0;
-    background-color: #201c33;
-    color: #b2adcc;
+  margin: 0;
+  padding: 0;
+  background-color: #414141;
+  color: #cfcfcf;
+  font-family: "Open Sans", sans-serif;
+}
+
+.desktop {
+  display: flex;
+  height: 100vh;
+}
+
+.statsColumn {
+  background-color: #575757;
+  border-left: 1px solid #c9c9c9;
+  margin-left: 10px;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  min-width: 300px;
+  max-width: 100%;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  border-bottom: 1px solid #c9c9c9;
+}
+
+.summaryRow #weekSummaryText {
+  font-size: 24px;
+}
+
+.summaryRow #weekSummaryGraph {
+  min-width: 185px;
+  max-width: 185px;
+  height: 80px;
+  min-height: 80px;
+  max-height: 80px;
+  background-color: rgb(32, 32, 32);
+}
+
+.summaryRow #weekSummaryGraph .graph {
+  stroke: rgb(170, 170, 170);
+  stroke-dasharray: 0;
+  stroke-width: 2;
+}
+
+.summaryRow #weekSummaryGraph .labels {
+  stroke: rgb(235, 235, 235);
+  font-size: 10px;
+  font-weight: 100;
+  stroke-width: 0.5;
+  font-family: "Open Sans", sans-serif;
+}
+
+.last10Sessions {
+  padding: 5px;
+}
+
+.smallHeader {
+  font-size: 20px;
+}
+
+.last10Sessions .sessionTable {
+  margin-top: 10px;
+  width: 100%;
+  background-color: #575757;
+  color: rgb(240, 240, 240);
+  border-collapse: collapse;
+}
+
+.last10Sessions .sessionTable table,
+.last10Sessions .sessionTable th,
+.last10Sessions .sessionTable td {
+  border: 1px solid #fff;
+}
+
+.last10Sessions .sessionTable th,
+.last10Sessions .sessionTable td {
+  padding: 5px;
+}
+
+.last10Sessions .sessionTable th {
+  text-align: left;
 }

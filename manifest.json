@@ -1,52 +1,68 @@
 {
-    "manifest_version": 1,
-    "type": "WebApp",
-    "meta": {
-        "name": "Game Time Tracker",
-        "description": "This application enables you to track how much time you spend in your games and what APM/KPM you have throughout your sessions. Features pretty graphs and tasty stats!",
-        "version": "1.0.0",
-        "author": "NoLifeKing85",
-        "minimum-overwolf-version": "0.120.0",
-        "icon": "resources/images/logo.png",
-        "icon_gray": "resources/images/logo_bw.png",
-        "window_icon": "resources/images/logo.png",
-        "splash_image": "resources/images/splash.png"
+  "manifest_version": 1,
+  "type": "WebApp",
+  "meta": {
+    "name": "Game Time Tracker",
+    "description": "This application enables you to track how much time you spend in your games. Features pretty graphs and tasty stats!",
+    "version": "0.0.1",
+    "author": "NoLifeKing85",
+    "minimum-overwolf-version": "0.120.0",
+    "icon": "resources/images/logo.png",
+    "icon_gray": "resources/images/logo_bw.png",
+    "window_icon": "resources/images/logo.png",
+    "splash_image": "resources/images/splash.png"
+  },
+  "permissions": ["GameInfo", "Extensions"],
+  "data": {
+    "game_targeting": {
+      "type": "all"
     },
-    "permissions": ["GameInfo", "Extensions"],
-    "data": {
-        "game_targeting": {
-            "type": "all"
+    "start_window": "background",
+    "windows": {
+      "background": {
+        "file": "windows/background-window.html",
+        "show_in_taskbar": false,
+        "is_background_page": true,
+        "background_optimization": false,
+        "block_top_window_navigation": true
+      },
+      "mainWindow": {
+        "file": "windows/main-window.html",
+        "show_in_taskbar": true,
+        "is_background_page": false,
+        "block_top_window_navigation": true,
+        "grab_focus_on_desktop": true,
+        "desktop_only": true,
+        "transparent": false,
+        "show_minimize": true,
+        "show_maximize": false,
+        "resizable": false,
+        "keep_window_location": true,
+        "disable_hardware_acceleration": true,
+        "disable_auto_dpi_sizing": true,
+        "min_size": {
+          "width": 1000,
+          "height": 600
         },
-        "start_window": "background",
-        "windows": {
-            "background": {
-                "file": "windows/background-window.html",
-                "show_in_taskbar": false,
-                "is_background_page": true,
-                "background_optimization": false,
-                "block_top_window_navigation": true
-            },
-            "mainWindow": {
-                "file": "windows/main-window.html",
-                "show_in_taskbar": true,
-                "is_background_page": false,
-                "block_top_window_navigation": true,
-                "desktop_only": true,
-                "transparent": false,
-                "show_minimize": true,
-                "show_maximize": true,
-                "resizable": true
-            }
+        "size": {
+          "width": 1000,
+          "height": 600
         },
-        "launch_events": [
-            {
-                "event": "LaunchWithOverwolf"
-            }
-        ],
-        "developer": {
-            "enable_auto_refresh": true,
-            "reload_delay": 1000,
-            "filter": "*.*"
+        "max_size": {
+          "width": 1000,
+          "height": 600
         }
+      }
+    },
+    "launch_events": [
+      {
+        "event": "LaunchWithOverwolf"
+      }
+    ],
+    "developer": {
+      "enable_auto_refresh": true,
+      "reload_delay": 1000,
+      "filter": "*.js;*.html;*.css"
     }
+  }
 }

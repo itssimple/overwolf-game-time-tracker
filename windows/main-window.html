@@ -1,18 +1,64 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>Game Time Tracker - Overwolf</title>
-        <link type="text/css" href="../resources/css/main-window.css" rel="stylesheet" />
-        <script type="text/javascript" src="../resources/scripts/log.js"></script>
-    </head>
-    <body class="desktop">
-        <header class="titlebar">
-            <img src="../resources/images/logo.png" />
-            <h1>Game Time Tracker - Overwolf</h1>
-            <div class="titlebar-icons">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Game Time Tracker - Overwolf</title>
+    <link
+      type="text/css"
+      href="../resources/css/main-window.css"
+      rel="stylesheet"
+    />
+    <script type="text/javascript" src="../resources/scripts/log.js"></script>
+    <script type="text/javascript" src="../resources/scripts/mainWindow.js"></script>
+  </head>
+  <body class="desktop">
+    <div class="mainContainer">
+      <div class="summaryRow">
+        <span id="weekSummaryText"
+          >This week you spent {weekHours} hours and {weekMinutes} minutes in-game.</span
+        >
+        <svg id="weekSummaryGraph">
+          <g class="graph">
+            <line x1="5" x2="5" y1="75" y2="5" />
+          </g>
 
-            </div>
-        </header>
-    </body>
+          <g class="graph">
+            <line x1="5" x2="180" y1="75" y2="75" />
+          </g>
+
+          <g class="labels">
+            <text x="10" y="15">HRS</text>
+            <text x="160" y="70">DAY</text>
+          </g>
+        </svg>
+      </div>
+      <div class="last10Sessions">
+        <span class="smallHeader">Your 10 latest sessions</span><br />
+        <table class="sessionTable">
+          <thead>
+            <tr>
+              <th>Game</th>
+              <th>Duration</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="sessionStats">
+            <tr>
+              <td colspan="3"><em>No played games so far</em></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="statsColumn">
+        Top game<br />
+        {topGameTitle} ({topGameHours})<br />
+        <br />
+        Highest APM<br />
+        {topAPMTitle} ({topAPM})<br />
+        <br />
+        Game starts<br />
+        {gameStart[x].count} {gameStart[x].title}
+    </div>
+  </body>
 </html>
