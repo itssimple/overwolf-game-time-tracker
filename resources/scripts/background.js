@@ -1,4 +1,5 @@
 /// <reference path="log.js" />
+/// <reference path="database.js" />
 /// <reference path="eventEmitter.js" />
 
 var firstLaunch = true;
@@ -37,7 +38,8 @@ if (firstLaunch) {
   }
 
   if (!window.db) {
-    initializeGameTrackerDatabase();
+    window.db = new GameTimeTrackerDatabase();
+    db.initializeDatabase();
   }
 
   firstLaunch = false;
@@ -52,70 +54,14 @@ if (firstLaunch) {
   overwolf.games.onGameInfoUpdated.addListener(gameInfoUpdated);
 
   window.eventEmitter.addEventListener("game-launched", function (gameInfo) {
-    log("[GAME-LAUNCH]", gameInfo);
-
-    db.transaction("gameSessions", "readwrite")
-      .objectStore("gameSessions")
-      .add({
-        sessionId: gameInfo.sessionId,
-        gameClass: gameInfo.classId,
-        gameTitle: gameInfo.title,
-        startDate: Date.now(),
-        endDate: null,
-      });
+    db.newGameSession(gameInfo);
   });
+
   window.eventEmitter.addEventListener("game-exited", function (gameInfo) {
-    log("[GAME-EXIT]", gameInfo);
-
-    gameSessionStore = db
-      .transaction("gameSessions", "readwrite")
-      .objectStore("gameSessions")
-      .index("by_gameclass")
-      .openCursor(
-        IDBKeyRange.only(gameInfo.gameInfo.classId),
-        "prev"
-      ).onsuccess = function (event) {
-      var cursor = event.target.result;
-
-      if (cursor) {
-        if (cursor.value.endDate == null) {
-          const updateSession = cursor.value;
-          updateSession.endDate = Date.now();
-          cursor.update(updateSession);
-
-          return;
-        }
-        cursor.continue();
-      }
-    };
+    db.updateGameSession(gameInfo);
   });
 
   log("[INIT]", "All eventhandlers have been set");
 
   openWindow(null);
-}
-
-function initializeGameTrackerDatabase() {
-  let dbRequest = window.indexedDB.open("gameTimeTracker", 1);
-
-  dbRequest.onupgradeneeded = function (event) {
-    const db = dbRequest.result;
-
-    if (event.oldVersion < 1) {
-      log(
-        "[DB]",
-        "Creating first version of database, since it never existed on this installation."
-      );
-      const gameSessionStore = db.createObjectStore("gameSessions", {
-        autoIncrement: true,
-      });
-
-      gameSessionStore.createIndex("by_gameclass", "gameClass");
-      gameSessionStore.createIndex("by_sessionid", "sessionId");
-    }
-  };
-
-  dbRequest.onsuccess = function () {
-    window.db = dbRequest.result;
-  };
 }
