@@ -21,7 +21,6 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 5px;
-  border-bottom: 1px solid #c9c9c9;
 }
 
 .summaryRow #weekSummaryGraph {
@@ -47,6 +46,7 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
-.last10Sessions {
-  margin-top: 5px;
+#sessionStats td {
+  padding-top: 4px;
+  padding-bottom: 4px;
 }

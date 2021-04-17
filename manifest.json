@@ -43,15 +43,15 @@
         "disable_auto_dpi_sizing": true,
         "min_size": {
           "width": 1000,
-          "height": 600
+          "height": 650
         },
         "size": {
           "width": 1000,
-          "height": 600
+          "height": 650
         },
         "max_size": {
           "width": 1000,
-          "height": 600
+          "height": 650
         }
       }
     },
