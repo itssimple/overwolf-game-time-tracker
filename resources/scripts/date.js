@@ -3,9 +3,8 @@
  * @param {Number} timestamp
  */
 function NDate(timestamp) {
-  this.date = new Date(timestamp);
   this.timestamp = timestamp;
-
+  this.date = new Date(timestamp);
   /**
    *
    * @param {Number} days Use an integer, will floor it
@@ -17,14 +16,24 @@ function NDate(timestamp) {
 
     this.timestamp = this.timestamp + Math.floor(days) * 86400000;
 
-    updateDate();
+    this.updateDate();
 
     return this;
   };
 
-  function updateDate() {
-    this.date = new Date(timestamp);
-  }
+  this.updateDate = function updateDate() {
+    this.date = new Date(this.timestamp);
+  };
+
+  this.removeTime = function () {
+    let x = new Date(this.timestamp);
+    x.setHours(0, 0, 0, 0);
+    this.timestamp = x.getTime();
+
+    this.updateDate();
+
+    return this;
+  };
 
   return this;
 }

@@ -2,6 +2,9 @@
 /// <reference path="database.js" />
 /// <reference path="date.js" />
 /// <reference path="log.js" />
+/// <reference path="utils.js" />
+/// <reference path="bootstrap.min.js" />
+/// <reference path="chartist.min.js" />
 
 const backgroundWindow = overwolf.windows.getMainWindow();
 
@@ -34,8 +37,12 @@ function loadLatestSessions() {
 
     let gameStarts = document.querySelector("#gameStarts");
 
+    let weekSummary = document.querySelector("#weekSummaryText");
+
     gameSessionTable.innerHTML = "";
     gameStarts.innerHTML = "";
+    weekSummary.innerHTML = "";
+
     if (_rows.length === 0) {
       gameSessionTable.appendChild(
         addElement(
@@ -44,6 +51,9 @@ function loadLatestSessions() {
       );
 
       gameStarts.innerHTML = "<em>You have not played any games yet</em>";
+      weekSummary.innerHTML = "No data tracked yet, play some games! :)";
+
+      renderGraph(null);
     } else {
       let latestSession = true;
 
@@ -131,20 +141,19 @@ function loadLatestSessions() {
       let allSessions = Object.keys(gameStartItems).flatMap(function (key) {
         return gameStartItems[key].sessions;
       });
-      let sevenDaysAgo = new NDate(Date.now()).addDay(-7);
+      let sevenDaysAgo = new NDate(Date.now()).removeTime().addDay(-7);
       let sevenDays = allSessions
         .filter((i) => i.startDate >= sevenDaysAgo.timestamp)
         .map((s) => getTimeDifference(s.startDate, s.endDate))
         .reduce((a, b) => a + b);
 
       let weekObject = getTimeObject(sevenDays);
-      let weekSummary = document.querySelector("#weekSummaryText");
 
       let hours = "";
       if (weekObject.hours && weekObject.hours === 1) {
-        hours = `${weekObject.hours} hour<br />and `;
+        hours = `${weekObject.hours} hour and `;
       } else if (weekObject.hours > 1) {
-        hours = `${weekObject.hours} hours<br />and `;
+        hours = `${weekObject.hours} hours and `;
       }
 
       let minutes = "";
@@ -155,118 +164,52 @@ function loadLatestSessions() {
       }
 
       weekSummary.innerHTML = `The last 7 days you spent ${hours}${minutes} in-game.`;
+
+      renderGraph(allSessions);
     }
   });
 }
 
-/**
- * Shortens the text if it's longer than the max length
- * @param {String} string
- * @param {Number} maxLength
- * @returns {String}
- */
-function shorten(string, maxLength) {
-  if (string.length > maxLength) {
-    return string.substring(0, maxLength).trim() + " ...";
-  }
-
-  return string;
-}
-
-/**
- * Sorts a the dictionary you send, based on the property (numbers)
- * @param {Object} dictionary
- * @param {String} property The property in the dictionary to sort on
- * @param {Boolean} ascending Sort ascending or descending (Default descending)
- */
-function sortDictionaryByProperty(dictionary, property, ascending) {
-  let items = Object.keys(dictionary).map(function (key) {
-    return [key, dictionary[key]];
-  });
-
-  items.sort(function (first, second) {
-    if (ascending) return first[1][property] - second[1][property];
-    return second[1][property] - first[1][property];
-  });
-
-  return items;
-}
-
-/**
- * Outputs a date in YYYY-MM-DD format
- * @param {Date} date
- */
-function formatDate(date) {
-  let retVal = "";
-
-  retVal += date.getFullYear() + "-";
-  if (date.getMonth() + 1 < 10) {
-    retVal += "0";
-  }
-  retVal += date.getMonth() + 1 + "-";
-
-  if (date.getDate() < 10) {
-    retVal += "0";
-  }
-  retVal += date.getDate();
-
-  return retVal;
-}
-
-/**
- *
- * @param {Date} startDate
- * @param {Date} endDate
- * @param {Boolean} latestSession
- * @returns {String}
- */
-function formatTimespan(startDate, endDate, latestSession) {
-  if (!latestSession && !endDate) return `Unknown, no end time`;
-  return outputTimesObjectFromDifference(getTimeDifference(startDate, endDate));
-}
-
-/**
- *
- * @param {Number} days
- * @param {Number} hours
- * @param {Number} minutes
- * @param {Number} seconds
- * @returns {String}
- */
-function outputTimesObject(days, hours, minutes, seconds) {
-  return `${days > 0 ? days + "d, " : ""}${hours > 0 ? hours + "h, " : ""}${
-    minutes > 0 ? minutes + "m, " : ""
-  }${seconds + "s"}`;
-}
-
-function outputTimesObjectFromDifference(differenceInSeconds) {
-  let { days, hours, minutes, seconds } = getTimeObject(differenceInSeconds);
-  return outputTimesObject(days, hours, minutes, seconds);
-}
-
-/**
- *
- * @param {Date} startDate
- * @param {Date} endDate
- * @returns {Number}
- */
-function getTimeDifference(startDate, endDate) {
-  if (!endDate) endDate = Date.now();
-  return (endDate - startDate) / 1000;
-}
-
-function getTimeObject(differenceInSeconds) {
-  let days = Math.floor(differenceInSeconds / (24 * 3600));
-  let hours = Math.floor((differenceInSeconds % (24 * 3600)) / 3600);
-  let minutes = Math.floor((differenceInSeconds % 3600) / 60);
-  let seconds = Math.floor(differenceInSeconds % 60);
-
-  return {
-    days,
-    hours,
-    minutes,
-    seconds,
+function renderGraph(data) {
+  let sevenDaysAgo = new NDate(Date.now()).removeTime().addDay(-7);
+  let chartData = {
+    labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"],
+    series: [[0, 0, 0, 0, 0, 0, 0]],
   };
+
+  for (let x = 0; x < 7; x++) {
+    let dayAgo = new NDate(Date.now()).removeTime().addDay(x - 6);
+    chartData.labels[x] = formatDate(dayAgo.date);
+  }
+
+  if (!data || data === null) {
+  } else {
+    for (let x = 0; x < 7; x++) {
+      let dayAgo = new NDate(Date.now()).removeTime().addDay(x - 6);
+
+      let start = dayAgo.timestamp;
+      let end = dayAgo.addDay(1).timestamp;
+
+      var dayData = data
+        .filter((s) => s.startDate >= start && s.startDate <= end)
+        .map((i) => getTimeDifference(i.startDate, i.endDate));
+
+      let hours = 0.0;
+      if (dayData.length > 0) {
+        let d = dayData.reduce((a, b) => a + b);
+        hours = d / 3600;
+      }
+
+      chartData.series[0][x] = hours;
+    }
+  }
+
+  new Chartist.Bar("#weekSummaryGraph", chartData, {
+    axisY: {
+      offset: 45,
+      labelInterpolationFnc: (value) => `${value}hrs`,
+    },
+  });
 }
 
 (function () {
