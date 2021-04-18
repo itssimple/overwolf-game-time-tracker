@@ -10,7 +10,8 @@
     "icon": "resources/images/logo.png",
     "icon_gray": "resources/images/logo_bw.png",
     "window_icon": "resources/images/logo.png",
-    "splash_image": "resources/images/splash.png"
+    "splash_image": "resources/images/splash.png",
+    "launcher_icon": "resources/images/gtt-icon.ico"
   },
   "permissions": ["GameInfo", "Extensions"],
   "data": {
@@ -55,9 +56,13 @@
         }
       }
     },
+    "force_browser": "user",
     "launch_events": [
       {
         "event": "LaunchWithOverwolf"
+      },
+      {
+        "event": "AllGamesLaunch"
       }
     ],
     "developer": {

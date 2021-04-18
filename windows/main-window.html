@@ -19,7 +19,7 @@
     <div class="container-fluid h-100">
       <div class="row h-100">
         <div class="col-8 pt-2">
-          <div class="card text-white border-secondary mb-3">
+          <div class="card text-white border-secondary mb-3" style="min-height: 649px; max-height: 649px;">
             <div class="card-header" id="weekSummaryText">
               The last 7 days you spent 9999 hours and 59 minutes in-game.
             </div>
@@ -45,24 +45,35 @@
           </div>
         </div>
         <div class="col-4 pt-2">
-          <div class="card text-white border-secondary mb-3" style="max-width: 20rem; max-height: 175px;">
+          <div class="card text-white border-secondary mb-3" style="max-width: 20rem; max-height: 175px; min-height: 175px;">
             <div class="card-header">Top Game</div>
             <div class="card-body">
               <h4 class="card-title" id="topGameTitle">{topGameTitle}</h4>
               <p class="card-text" id="topGameTime">Played {topGameTime}</p>
             </div>
           </div>
-          <!--<div class="card text-white border-secondary mb-3" style="max-width: 20rem;">
-            <div class="card-header">Highest APM</div>
-            <div class="card-body">
-              <h4 class="card-title">{topAPMTitle}</h4>
-              <p class="card-text">{topAPM} APM</p>
-            </div>
-          </div>-->
-          <div class="card text-white border-secondary mb-3" style="max-width: 20rem; max-height: 323px; min-height: 323px;">
+          <div class="card text-white border-secondary mb-3" style="max-width: 20rem; max-height: 328px; min-height: 328px;">
             <div class="card-header">Top 10 Game Starts</div>
             <div class="card-body">
               <p class="card-text" id="gameStarts">{gameStart[x].count} {gameStart[x].title}</p>
+            </div>
+          </div>
+          <div class="card text-white border-secondary mb-3" style="max-width: 20rem;">
+            <div class="card-header">Contact / Support</div>
+            <div class="card-body">
+              <p class="card-text">
+                <a href="https://discord.gg/BX26UrfdJq" target="_blank">
+                  <img src="../resources/images/Discord-Logo-White.svg" alt="Discord link" style="width: 24px; height: 24px;" />
+                  Discord</a>
+                &nbsp;
+                <a href="https://twitter.com/NoLifeKing85" target="_blank">
+                  <img src="../resources/images/Twitter_Logo.svg" alt="Twitter link" style="width: 24px; height: 24px;" />
+                  Twitter</a>
+                &nbsp;
+                <a href="https://twitch.tv/NoLifeKing85" target="_blank">
+                  <img src="../resources/images/Twitch_Glitch_Logo_White.svg" alt="Twitch link" style="width: 24px; height: 24px;" />
+                  Twitch</a>
+              </p>
             </div>
           </div>
         </div>

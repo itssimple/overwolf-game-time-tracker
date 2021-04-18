@@ -20,7 +20,6 @@ function EventEmitter() {
     this.eventListeners
       .filter((ev) => ev.eventName == eventName)
       .forEach((l) => {
-        log(`[EVENT:${eventName}]`, l, arguments);
         l.handler(arguments);
       });
   };

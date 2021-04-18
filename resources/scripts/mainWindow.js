@@ -43,15 +43,16 @@ function loadLatestSessions() {
     gameStarts.innerHTML = "";
     weekSummary.innerHTML = "";
 
-    if (_rows.length === 0) {
-      gameSessionTable.appendChild(
-        addElement(
-          `<tr><td colspan="3"><em>No played games so far</em></td></tr>`
-        )
-      );
+    if (_rows.length == 0) {
+      let noGames = document.createElement("tr");
+      noGames.innerHTML = `<td colspan="3" class="text-center" style="height: 305px; vertical-align: middle;"><em>No played games so far</em></td>`;
+      gameSessionTable.appendChild(noGames);
 
       gameStarts.innerHTML = "<em>You have not played any games yet</em>";
       weekSummary.innerHTML = "No data tracked yet, play some games! :)";
+
+      topGameTitle.innerHTML = shorten("No games played yet", 45);
+      topGameTime.innerHTML = "";
 
       renderGraph(null);
     } else {
@@ -92,6 +93,20 @@ function loadLatestSessions() {
         rowCount++;
       }
 
+      if (rowCount < 10) {
+        let row = document.createElement("tr");
+        row.innerHTML = `
+<td colspan="3" rowspan="${
+          10 - rowCount
+        }" class="text-center" style="vertical-align: middle; height: ${
+          (10 - rowCount) * 31
+        }px;">
+  <em>Play more games to fill this area!</em>
+</td>`;
+
+        gameSessionTable.appendChild(row);
+      }
+
       let gameStartArray = sortDictionaryByProperty(
         gameStartItems,
         "startCount",
@@ -105,10 +120,9 @@ function loadLatestSessions() {
         var game = start[1];
         if (gameStartRows < 10) {
           let gStart = document.createElement("div");
-          gStart.innerHTML = `${game.startCount}x ${shorten(
-            game.gameTitle,
-            30
-          )}`;
+          gStart.innerHTML = `<span class="badge badge-secondary">${
+            game.startCount
+          }</span> ${shorten(game.gameTitle, 30)}`;
           gameStarts.appendChild(gStart);
         }
 
@@ -141,7 +155,7 @@ function loadLatestSessions() {
       let allSessions = Object.keys(gameStartItems).flatMap(function (key) {
         return gameStartItems[key].sessions;
       });
-      let sevenDaysAgo = new NDate(Date.now()).removeTime().addDay(-7);
+      let sevenDaysAgo = new NDate(Date.now()).removeTime().addDay(-6);
       let sevenDays = allSessions
         .filter((i) => i.startDate >= sevenDaysAgo.timestamp)
         .map((s) => getTimeDifference(s.startDate, s.endDate))
@@ -163,7 +177,16 @@ function loadLatestSessions() {
         minutes = `${weekObject.minutes} minutes`;
       }
 
-      weekSummary.innerHTML = `The last 7 days you spent ${hours}${minutes} in-game.`;
+      let seconds = "";
+      if (minutes == "" && hours == "") {
+        if (weekObject.seconds == 1) {
+          seconds = "one second";
+        } else if (weekObject.seconds > 1) {
+          seconds = `${weekObject.seconds} seconds`;
+        }
+      }
+
+      weekSummary.innerHTML = `The last 7 days you spent ${hours}${minutes}${seconds} in-game.`;
 
       renderGraph(allSessions);
     }
@@ -171,7 +194,6 @@ function loadLatestSessions() {
 }
 
 function renderGraph(data) {
-  let sevenDaysAgo = new NDate(Date.now()).removeTime().addDay(-7);
   let chartData = {
     labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"],
     series: [[0, 0, 0, 0, 0, 0, 0]],
@@ -204,12 +226,20 @@ function renderGraph(data) {
     }
   }
 
-  new Chartist.Bar("#weekSummaryGraph", chartData, {
-    axisY: {
-      offset: 45,
-      labelInterpolationFnc: (value) => `${value}hrs`,
-    },
-  });
+  setTimeout(function () {
+    new Chartist.Bar("#weekSummaryGraph", chartData, {
+      axisY: {
+        offset: 45,
+        labelInterpolationFnc: (value) => {
+          if (value < 1) {
+            return `${(value * 60).toFixed(0)}min`;
+          }
+          return `${value}hrs`;
+        },
+      },
+      height: 149,
+    });
+  }, 100);
 }
 
 (function () {
