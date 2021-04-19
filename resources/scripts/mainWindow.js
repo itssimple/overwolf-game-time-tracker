@@ -239,9 +239,18 @@ function renderGraph(data) {
       },
       height: 149,
     });
-  }, 100);
+  }, 200);
 }
 
 (function () {
   loadLatestSessions();
+
+  overwolf.windows.getCurrentWindow(function (window) {
+    new DraggableWindow(window.window, document.getElementById("titleBar"));
+    document
+      .getElementById("exitButton")
+      .addEventListener("click", function () {
+        overwolf.windows.close(window.window.id, function () {});
+      });
+  });
 })();

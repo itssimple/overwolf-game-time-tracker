@@ -62,6 +62,4 @@ if (firstLaunch) {
   });
 
   log("[INIT]", "All eventhandlers have been set");
-
-  openWindow(null);
 }

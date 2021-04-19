@@ -11,7 +11,7 @@
     "icon_gray": "resources/images/logo_bw.png",
     "window_icon": "resources/images/logo.png",
     "splash_image": "resources/images/splash.png",
-    "launcher_icon": "resources/images/gtt-icon.ico"
+    "launcher_icon": "resources/images/gtt-logo.ico"
   },
   "permissions": ["GameInfo", "Extensions"],
   "data": {
@@ -35,7 +35,7 @@
         "grab_focus_on_desktop": true,
         "desktop_only": true,
         "transparent": false,
-        "native_window": false,
+        "native_window": true,
         "show_minimize": true,
         "show_maximize": false,
         "resizable": false,
@@ -65,6 +65,7 @@
         "event": "AllGamesLaunch"
       }
     ],
+    "disable_dt": true,
     "developer": {
       "enable_auto_refresh": true,
       "reload_delay": 1000,

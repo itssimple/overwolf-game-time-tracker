@@ -10,13 +10,19 @@
       href="../resources/css/main-window.css"
       rel="stylesheet"
     />
+    <script type="text/javascript" src="../resources/scripts/draggable-window.js"></script>
     <script type="text/javascript" src="../resources/scripts/utils.js"></script>
     <script type="text/javascript" src="../resources/scripts/log.js"></script>
     <script type="text/javascript" src="../resources/scripts/date.js"></script>
     <script type="text/javascript" src="../resources/scripts/mainWindow.js"></script>
   </head>
   <body>
-    <div class="container-fluid h-100">
+    <nav class="navbar bg-dark navbar-dark" id="titleBar">
+      <span class="navbar-brand text-white text-bold">Game Time Tracker</span>
+      <button class="btn btn-primary btn-sm" id="exitButton">X</button>
+    </nav>
+    <div class="container-fluid h-80">
+
       <div class="row h-100">
         <div class="col-8 pt-2">
           <div class="card text-white border-secondary mb-3" style="min-height: 649px; max-height: 649px;">
