@@ -18,11 +18,18 @@ function openWindow(event) {
 }
 
 function gameLaunched(game) {
-  eventEmitter.emit("game-launched", game);
+  if (game) {
+    eventEmitter.emit("game-launched", game);
+  }
 }
 
 function gameInfoUpdated(game) {
-  if (!game.gameInfo.isRunning) {
+  if (
+    game &&
+    game.gameInfo &&
+    !game.gameInfo.isRunning &&
+    game.runningChanged
+  ) {
     eventEmitter.emit("game-exited", game);
   }
 }
