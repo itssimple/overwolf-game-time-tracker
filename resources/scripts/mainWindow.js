@@ -79,16 +79,16 @@ function loadLatestSessions() {
           latestSession = false;
         }
 
-        if (!gameStartItems[session.gameClass]) {
-          gameStartItems[session.gameClass] = {
+        if (!gameStartItems[session.gameTitle]) {
+          gameStartItems[session.gameTitle] = {
             gameTitle: session.gameTitle,
             startCount: 0,
             sessions: [],
           };
         }
 
-        gameStartItems[session.gameClass].startCount++;
-        gameStartItems[session.gameClass].sessions.push(session);
+        gameStartItems[session.gameTitle].startCount++;
+        gameStartItems[session.gameTitle].sessions.push(session);
 
         rowCount++;
       }
