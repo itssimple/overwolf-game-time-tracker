@@ -69,4 +69,8 @@ if (firstLaunch) {
   });
 
   log("[INIT]", "All eventhandlers have been set");
+
+  if (location.search.indexOf("-from-desktop") > -1) {
+    openWindow(null);
+  }
 }
