@@ -65,6 +65,7 @@
         "event": "AllGamesLaunch"
       }
     ],
+    "game_events": [10902],
     "disable_dt": true,
     "developer": {
       "enable_auto_refresh": true,
