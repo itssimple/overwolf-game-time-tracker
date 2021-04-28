@@ -4,15 +4,18 @@
 
 var firstLaunch = true;
 
+var mainWindowId = null;
+
 function openWindow(event) {
   if (event && event.origin == "overwolfstartlaunchevent") {
     return;
   }
   overwolf.windows.obtainDeclaredWindow("mainWindow", (result) => {
-    if (result.status !== "success") {
+    if (!result.success) {
       return;
     }
 
+    mainWindowId = result.window.id;
     overwolf.windows.restore(result.window.id);
   });
 }
@@ -164,11 +167,36 @@ if (firstLaunch) {
 
   window.eventEmitter.addEventListener("game-exited", function (gameInfo) {
     db.updateGameSession(gameInfo);
+
+    if (!mainWindowId) {
+      window.eventEmitter.emit("shutdown", null);
+      return;
+    }
+
+    overwolf.windows.getWindowState(mainWindowId, function (state) {
+      if (
+        state.success &&
+        (state.window_state_ex == "closed" || state.window_state_ex == "hidden")
+      ) {
+        window.eventEmitter.emit("shutdown", null);
+      }
+    });
+  });
+
+  window.eventEmitter.addEventListener("shutdown", function () {
+    log("[EXIT]", "Got told to exit the application, doing that!");
+    overwolf.windows.getCurrentWindow(function (window) {
+      overwolf.windows.close(window.window.id, function () {});
+    });
   });
 
   log("[INIT]", "All eventhandlers have been set");
 
-  if (location.search.indexOf("-from-desktop") > -1) {
+  if (
+    location.search.indexOf("-from-desktop") > -1 ||
+    location.search.indexOf("source=commandline") > -1 ||
+    location.search.indexOf("source=tray") > -1
+  ) {
     openWindow(null);
   }
 }

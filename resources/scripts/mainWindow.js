@@ -250,7 +250,20 @@ function renderGraph(data) {
     document
       .getElementById("exitButton")
       .addEventListener("click", function () {
+        overwolf.games.getRunningGameInfo(function (data) {
+          if (!data) {
+            log("[Exit]", "No games are running, exiting application");
+            eventEmitter.emit("shutdown", null);
+          }
+        });
+
         overwolf.windows.close(window.window.id, function () {});
       });
+
+    overwolf.extensions.current.getManifest(function (app) {
+      document.getElementById(
+        "titleBarName"
+      ).innerHTML = `Game Time Tracker - v${app.meta.version}`;
+    });
   });
 })();
