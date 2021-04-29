@@ -195,6 +195,10 @@ if (firstLaunch) {
   if (
     location.search.indexOf("-from-desktop") > -1 ||
     location.search.indexOf("source=commandline") > -1 ||
+    location.search.indexOf("source=dock") > -1 ||
+    location.search.indexOf("source=storeapi") > -1 ||
+    location.search.indexOf("source=odk") > -1 ||
+    location.search.indexOf("source=after-install") > -1 ||
     location.search.indexOf("source=tray") > -1
   ) {
     openWindow(null);
