@@ -20,6 +20,8 @@ function openWindow(event) {
   });
 }
 
+var backgroundGameUpdater = null;
+
 function gameLaunched(game) {
   if (game) {
     if (window.possibleGameName && window.possibleGameName != null) {
@@ -29,6 +31,12 @@ function gameLaunched(game) {
 
     log("[GAME:LAUNCH]", game);
     eventEmitter.emit("game-launched", game);
+
+    backgroundGameUpdater = setInterval(function () {
+      window.db.updateGameSessionBySessionId(game.sessionId, {
+        endDate: Date.now(),
+      });
+    }, 10000);
   }
 }
 
@@ -41,6 +49,9 @@ function gameInfoUpdated(game) {
   ) {
     log("[GAME:UPDATE]", game);
     eventEmitter.emit("game-exited", game);
+
+    clearInterval(backgroundGameUpdater);
+    backgroundGameUpdater = null;
   }
 }
 
