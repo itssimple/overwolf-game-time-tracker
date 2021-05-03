@@ -59,6 +59,11 @@
     "force_browser": "user",
     "launch_events": [
       {
+        "event": "LaunchWithOverwolf",
+        "tracked": true,
+        "include_launchers": true
+      },
+      {
         "event": "AllGamesLaunch",
         "tracked": true,
         "include_launchers": true

@@ -20,6 +20,12 @@ eventEmitter.addEventListener("game-launched", function () {
   loadLatestSessions();
 });
 
+eventEmitter.addEventListener("refresh-window", function (window) {
+  if (window == "mainWindow") {
+    loadLatestSessions();
+  }
+});
+
 eventEmitter.addEventListener("game-exited", function () {
   if (activeGameTicker != null) {
     clearInterval(activeGameTicker);

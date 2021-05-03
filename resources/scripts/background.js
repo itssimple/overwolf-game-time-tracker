@@ -24,8 +24,10 @@ function gameLaunched(game) {
   if (game) {
     if (window.possibleGameName && window.possibleGameName != null) {
       game.title = window.possibleGameName;
+      log("[GAME:TITLE]", "Custom title", game.title);
     }
 
+    log("[GAME:LAUNCH]", game);
     eventEmitter.emit("game-launched", game);
   }
 }
@@ -37,6 +39,7 @@ function gameInfoUpdated(game) {
     !game.gameInfo.isRunning &&
     game.runningChanged
   ) {
+    log("[GAME:UPDATE]", game);
     eventEmitter.emit("game-exited", game);
   }
 }
@@ -89,14 +92,14 @@ function setLauncherEvents(finishedSettingFeatures) {
 }
 
 function onLauncherLaunched(launcherInfo) {
-  log("[LAUNCHER]", launcherInfo);
+  log("[GAME:LAUNCHER]", launcherInfo);
   if (launcherInfo.classId == 10902) {
     setLauncherEvents();
   }
 }
 
 function onLauncherTerminated(result) {
-  log("[LAUNCHER]", result);
+  log("[GAME:LAUNCHER]", result);
   window.possibleGameName = null;
 }
 
@@ -112,7 +115,34 @@ if (firstLaunch) {
 
   if (!window.db) {
     window.db = new GameTimeTrackerDatabase();
-    db.initializeDatabase();
+
+    db.initializeDatabase(function () {
+      if (location.search.indexOf("overwolfstartlaunchevent")) {
+        // When Overwolf starts up, we check if there's an ongoing session, and then abort it, unless the game is still active.
+        window.db.getUnfinishedSessions(function (unfinishedSessions) {
+          if (unfinishedSessions && unfinishedSessions.length > 0) {
+            log(
+              "[SESSION:CLEANUP]",
+              `Found ${unfinishedSessions.length} unfinished sessions to fix.`
+            );
+
+            for (let session of unfinishedSessions) {
+              log("[SESSION:CLEANUP]", "Unfinished session", session);
+
+              // Lets just set it as one minute extra from start right now.
+              session.endDate = session.startDate + 60000;
+              window.db.updateGameSessionBySessionId(
+                session.sessionId,
+                session,
+                function () {
+                  window.eventEmitter.emit("reload-window", "mainWindow");
+                }
+              );
+            }
+          }
+        });
+      }
+    });
   }
 
   firstLaunch = false;
@@ -191,6 +221,8 @@ if (firstLaunch) {
   });
 
   log("[INIT]", "All eventhandlers have been set");
+
+  log("[INIT:LAUNCHREASON]", location.search);
 
   if (
     location.search.indexOf("-from-desktop") > -1 ||

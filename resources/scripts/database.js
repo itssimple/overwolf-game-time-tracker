@@ -1,7 +1,7 @@
 function GameTimeTrackerDatabase() {
   this.DBInstance = null;
 
-  this.initializeDatabase = function () {
+  this.initializeDatabase = function (finishedLoadingCallback = null) {
     let dbRequest = window.indexedDB.open("gameTimeTracker", 2);
 
     dbRequest.onupgradeneeded = function (event) {
@@ -31,6 +31,10 @@ function GameTimeTrackerDatabase() {
     dbRequest.onsuccess = function () {
       log("[DB]", "Loaded database");
       window.db.DBInstance = dbRequest.result;
+
+      if (finishedLoadingCallback) {
+        finishedLoadingCallback();
+      }
     };
   };
   this.newGameSession = function (gameInfo) {
@@ -45,7 +49,7 @@ function GameTimeTrackerDatabase() {
       });
   };
 
-  this.updateGameSession = function (gameInfo) {
+  this.updateGameSession = function (gameInfo, updateComplete) {
     this.DBInstance.transaction("gameSessions", "readwrite")
       .objectStore("gameSessions")
       .index("by_gameclass")
@@ -61,9 +65,55 @@ function GameTimeTrackerDatabase() {
           updateSession.endDate = Date.now();
           cursor.update(updateSession);
 
+          if (updateComplete) {
+            updateComplete();
+          }
           return;
         }
         cursor.continue();
+      }
+    };
+  };
+
+  this.updateGameSessionBySessionId = function (
+    sessionId,
+    sessionData,
+    updateComplete
+  ) {
+    this.DBInstance.transaction("gameSessions", "readwrite")
+      .objectStore("gameSessions")
+      .index("by_sessionid")
+      .openCursor(IDBKeyRange.only(sessionId), "prev").onsuccess = function (
+      event
+    ) {
+      var cursor = event.target.result;
+
+      if (cursor) {
+        const updateSession = cursor.value;
+
+        if (sessionData.endDate) {
+          updateSession.endDate = sessionData.endDate;
+        }
+
+        if (sessionData.gameClass) {
+          updateSession.gameClass = sessionData.gameClass;
+        }
+
+        if (sessionData.gameTitle) {
+          updateSession.gameTitle = sessionData.gameTitle;
+        }
+
+        if (sessionData.startDate) {
+          updateSession.startDate = sessionData.startDate;
+        }
+
+        cursor.update(updateSession);
+
+        if (updateComplete) {
+          updateComplete();
+        }
+
+        return;
       }
     };
   };
@@ -78,6 +128,26 @@ function GameTimeTrackerDatabase() {
 
       if (cursor) {
         rows.push(cursor.value);
+
+        cursor.continue();
+      } else {
+        resultCallback(rows);
+      }
+    };
+  };
+
+  this.getUnfinishedSessions = function (resultCallback) {
+    let rows = [];
+    this.DBInstance.transaction("gameSessions", "readonly")
+      .objectStore("gameSessions")
+      .index("by_startdate")
+      .openCursor(null, "prev").onsuccess = function (event) {
+      var cursor = event.target.result;
+
+      if (cursor) {
+        if (!cursor.value.endDate) {
+          rows.push(cursor.value);
+        }
 
         cursor.continue();
       } else {
