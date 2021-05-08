@@ -31,6 +31,25 @@ function sortDictionaryByProperty(dictionary, property, ascending) {
   return items;
 }
 
+function sortDictionaryByPropertyAlphabetically(
+  dictionary,
+  property,
+  ascending
+) {
+  let internal = sortDictionaryByProperty(dictionary, property, ascending);
+
+  var keys = internal.map((v) => v[0]).sort();
+
+  let newItems = [];
+  for (let key of keys) {
+    newItems.push([key, internal.filter((v) => v[0] == key)[0][1]]);
+  }
+
+  console.log(newItems);
+
+  return newItems;
+}
+
 /**
  * Outputs a date in YYYY-MM-DD format
  * @param {Date} date

@@ -38,6 +38,8 @@ function loadLatestSessions() {
   db.getSessions(function (_rows) {
     let gameSessionTable = document.querySelector("#sessionStats");
 
+    let allSessionTable = document.querySelector("#summaryStats");
+
     let topGameTitle = document.querySelector("#topGameTitle");
     let topGameTime = document.querySelector("#topGameTime");
 
@@ -48,11 +50,13 @@ function loadLatestSessions() {
     gameSessionTable.innerHTML = "";
     gameStarts.innerHTML = "";
     weekSummary.innerHTML = "";
+    allSessionTable.innerHTML = "";
 
     if (_rows.length == 0) {
       let noGames = document.createElement("tr");
       noGames.innerHTML = `<td colspan="3" class="text-center" style="height: 305px; vertical-align: middle;"><em>No played games so far</em></td>`;
       gameSessionTable.appendChild(noGames);
+      allSessionTable.appendChild(noGames);
 
       gameStarts.innerHTML = "<em>You have not played any games yet</em>";
       weekSummary.innerHTML = "No data tracked yet, play some games! :)";
@@ -155,6 +159,32 @@ function loadLatestSessions() {
       topGameTime.innerHTML = `Played: ${outputTimesObjectFromDifference(
         totalTimeByTime[0][1].totalTime
       )}`;
+
+      let allGamesArray = sortDictionaryByPropertyAlphabetically(
+        gameStartItems,
+        "gameTitle",
+        true
+      );
+
+      console.log(allGamesArray);
+
+      for (let game of allGamesArray) {
+        let _game = game[1];
+
+        let totalGameTime = _game.sessions
+          .map((s) => getTimeDifference(s.startDate, s.endDate))
+          .reduce((a, b) => a + b);
+
+        let row = document.createElement("tr");
+        row.innerHTML = `
+        <td>${shorten(_game.gameTitle, 50)}</td>
+        <td class="text-right" style="width: 60px;">${_game.startCount}</td>
+        <td class="text-right" style="width: 120px;">${outputTimesObjectFromDifference(
+          totalGameTime
+        )}</td>`;
+
+        allSessionTable.appendChild(row);
+      }
 
       window.gameStartItems = gameStartItems;
 

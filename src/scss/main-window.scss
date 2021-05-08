@@ -90,3 +90,7 @@ body {
   padding-right: 1rem;
   background-color: var(--default-backgroundcolor) !important;
 }
+
+.fade {
+  transition: opacity 0.08s;
+}
