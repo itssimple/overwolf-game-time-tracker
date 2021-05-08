@@ -3,91 +3,210 @@
   <head>
     <meta charset="UTF-8" />
     <title>Game Time Tracker - Overwolf</title>
-    <link type="text/css" href="../resources/css/chartist.min.css" rel="stylesheet" />
-    <link type="text/css" href="../resources/css/bootstrap.min.css" rel="stylesheet" />
+    <link
+      type="text/css"
+      href="../resources/css/chartist.min.css"
+      rel="stylesheet"
+    />
+    <link
+      type="text/css"
+      href="../resources/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <link
       type="text/css"
       href="../resources/css/main-window.css"
       rel="stylesheet"
     />
-    <script type="text/javascript" src="../resources/scripts/draggable-window.js"></script>
+    <script
+      type="text/javascript"
+      src="../resources/scripts/draggable-window.js"
+    ></script>
     <script type="text/javascript" src="../resources/scripts/utils.js"></script>
     <script type="text/javascript" src="../resources/scripts/log.js"></script>
     <script type="text/javascript" src="../resources/scripts/date.js"></script>
-    <script type="text/javascript" src="../resources/scripts/mainWindow.js"></script>
+    <script
+      type="text/javascript"
+      src="../resources/scripts/mainWindow.js"
+    ></script>
   </head>
   <body>
     <nav class="navbar bg-dark navbar-dark" id="titleBar">
-      <span class="navbar-brand text-white text-bold" id="titleBarName">Game Time Tracker</span>
+      <span class="navbar-brand text-white text-bold" id="titleBarName"
+        >Game Time Tracker</span
+      >
       <button class="btn btn-primary btn-sm" id="exitButton">X</button>
     </nav>
-    <div class="container-fluid h-80">
-
-      <div class="row h-100">
-        <div class="col-8 pt-2">
-          <div class="card text-white border-secondary mb-3" style="min-height: 649px; max-height: 649px;">
-            <div class="card-header" id="weekSummaryText">
-              The last 7 days you spent 9999 hours and 59 minutes in-game.
+    <!--<ul class="nav nav-tabs" id="main-navigation" role="tablist">
+      <li class="nav-item" role="presentation">
+        <a
+          class="nav-link active"
+          id="home-tab"
+          data-toggle="tab"
+          href="#home"
+          role="tab"
+          aria-controls="home"
+          aria-selected="true"
+          >Dashboard</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          class="nav-link"
+          id="summary-tab"
+          data-toggle="tab"
+          href="#summary"
+          role="tab"
+          aria-controls="summary"
+          aria-selected="true"
+          >Game summary</a
+        >
+      </li>
+    </ul>-->
+    <div class="container-fluid h-80" id="main-win-container">
+      <div class="tab-content" id="main-tabcontent">
+        <div
+          class="tab-pane fade show active"
+          id="home"
+          role="tabpanel"
+          aria-labelledby="home-tab"
+        >
+          <div class="row h-100">
+            <div class="col-8 pt-2">
+              <div
+                class="card text-white border-secondary mb-3"
+                style="min-height: 649px; max-height: 649px"
+              >
+                <div class="card-header" id="weekSummaryText">
+                  The last 7 days you spent 9999 hours and 59 minutes in-game.
+                </div>
+                <div class="card-body">
+                  <div id="weekSummaryGraph"></div>
+                  <br />
+                  <div class="last10Sessions">
+                    <h5 class="smallHeader">Your 10 last sessions</h5>
+                    <table
+                      class="table table-striped table-small table-dark table-bordered table-sm"
+                    >
+                      <thead class="thead-dark">
+                        <tr>
+                          <th>Game</th>
+                          <th class="text-right">Duration</th>
+                          <th class="text-center">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody id="sessionStats"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="card-body">
-              <div id="weekSummaryGraph"></div>
-              <br />
-              <div class="last10Sessions">
-                <h5 class="smallHeader">Your 10 last sessions</h5>
-                <table class="table table-striped table-small table-dark table-bordered table-sm">
-                  <thead class="thead-dark">
-                    <tr>
-                      <th>Game</th>
-                      <th class="text-right">Duration</th>
-                      <th class="text-center">Date</th>
-                    </tr>
-                  </thead>
-                  <tbody id="sessionStats">
-
-                  </tbody>
-                </table>
+            <div class="col-4 pt-2">
+              <div
+                class="card text-white border-secondary mb-3"
+                style="max-width: 20rem; max-height: 175px; min-height: 175px"
+              >
+                <div class="card-header">Top Game</div>
+                <div class="card-body">
+                  <h4 class="card-title" id="topGameTitle">{topGameTitle}</h4>
+                  <p class="card-text" id="topGameTime">Played {topGameTime}</p>
+                </div>
+              </div>
+              <div
+                class="card text-white border-secondary mb-3"
+                style="max-width: 20rem; max-height: 328px; min-height: 328px"
+              >
+                <div class="card-header">Top 10 Game Starts</div>
+                <div class="card-body">
+                  <p class="card-text" id="gameStarts">
+                    {gameStart[x].count} {gameStart[x].title}
+                  </p>
+                </div>
+              </div>
+              <div
+                class="card text-white border-secondary mb-3"
+                style="max-width: 20rem"
+              >
+                <div class="card-header">Contact / Support</div>
+                <div class="card-body">
+                  <p class="card-text">
+                    <a href="https://discord.gg/BX26UrfdJq" target="_blank">
+                      <img
+                        src="../resources/images/Discord-Logo-White.svg"
+                        alt="Discord link"
+                        style="width: 24px; height: 24px"
+                      />
+                      Discord</a
+                    >
+                    &nbsp;
+                    <a href="https://twitter.com/NoLifeKing85" target="_blank">
+                      <img
+                        src="../resources/images/Twitter_Logo.svg"
+                        alt="Twitter link"
+                        style="width: 24px; height: 24px"
+                      />
+                      Twitter</a
+                    >
+                    &nbsp;
+                    <a href="https://twitch.tv/NoLifeKing85" target="_blank">
+                      <img
+                        src="../resources/images/Twitch_Glitch_Logo_White.svg"
+                        alt="Twitch link"
+                        style="width: 24px; height: 24px"
+                      />
+                      Twitch</a
+                    >
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-4 pt-2">
-          <div class="card text-white border-secondary mb-3" style="max-width: 20rem; max-height: 175px; min-height: 175px;">
-            <div class="card-header">Top Game</div>
-            <div class="card-body">
-              <h4 class="card-title" id="topGameTitle">{topGameTitle}</h4>
-              <p class="card-text" id="topGameTime">Played {topGameTime}</p>
+        <div
+          class="tab-pane fade"
+          id="summary"
+          role="tabpanel"
+          aria-labelledby="summary-tab"
+        >
+          <div class="row h-100">
+            <div class="col-12 pt-2">
+              <div
+                class="card text-white border-secondary mb-3"
+                style="min-height: 649px; max-height: 649px"
+              >
+                <div class="card-header">
+                  Summary of all your sessions, per game
+                </div>
+                <div class="card-body">
+                  <div class="gameSummaryData">
+                    <table
+                      class="table table-striped table-small table-dark table-bordered table-sm"
+                    >
+                      <thead class="thead-dark">
+                        <tr>
+                          <th>Game</th>
+                          <th class="text-right">Duration</th>
+                        </tr>
+                      </thead>
+                      <tbody id="summaryStats"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="card text-white border-secondary mb-3" style="max-width: 20rem; max-height: 328px; min-height: 328px;">
-            <div class="card-header">Top 10 Game Starts</div>
-            <div class="card-body">
-              <p class="card-text" id="gameStarts">{gameStart[x].count} {gameStart[x].title}</p>
-            </div>
-          </div>
-          <div class="card text-white border-secondary mb-3" style="max-width: 20rem;">
-            <div class="card-header">Contact / Support</div>
-            <div class="card-body">
-              <p class="card-text">
-                <a href="https://discord.gg/BX26UrfdJq" target="_blank">
-                  <img src="../resources/images/Discord-Logo-White.svg" alt="Discord link" style="width: 24px; height: 24px;" />
-                  Discord</a>
-                &nbsp;
-                <a href="https://twitter.com/NoLifeKing85" target="_blank">
-                  <img src="../resources/images/Twitter_Logo.svg" alt="Twitter link" style="width: 24px; height: 24px;" />
-                  Twitter</a>
-                &nbsp;
-                <a href="https://twitch.tv/NoLifeKing85" target="_blank">
-                  <img src="../resources/images/Twitch_Glitch_Logo_White.svg" alt="Twitch link" style="width: 24px; height: 24px;" />
-                  Twitch</a>
-              </p>
-            </div>
-          </div>
-        </div>
         </div>
       </div>
+    </div>
 
-    <script type="text/javascript" src="../resources/scripts/jquery.min.js"></script>
-    <script type="text/javascript" src="../resources/scripts/bootstrap.min.js"></script>
+    <script
+      type="text/javascript"
+      src="../resources/scripts/jquery.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="../resources/scripts/bootstrap.min.js"
+    ></script>
     <script src="../resources/scripts/chartist.min.js"></script>
   </body>
 </html>
