@@ -2,6 +2,7 @@ const gulp = require("gulp");
 const replace = require("gulp-replace");
 const sass = require("gulp-sass");
 const cleancss = require("gulp-clean-css");
+const purgecss = require("gulp-purgecss");
 const pinfo = require("./package.json");
 const exec = require("child_process").exec;
 var uglify = require("gulp-uglify");
@@ -19,6 +20,17 @@ gulp.task("styles-nano", function () {
     .pipe(sass().on("error", sass.logError))
     .pipe(cleancss())
     .pipe(gulp.dest("resources/css/"));
+});
+
+gulp.task("purge-unused-css", function () {
+  return gulp
+    .src("src/scss/bootstrap.min.css")
+    .pipe(
+      purgecss({
+        content: ["windows/**/*.html", "src/scripts/**/*.js"],
+      })
+    )
+    .pipe(gulp.dest("resources/css"));
 });
 
 gulp.task("minify-scripts", function () {
@@ -39,9 +51,25 @@ gulp.task("build-archive", function (callback) {
 });
 
 gulp.task("default", function () {
-  gulp.watch("src/scss/**/*.scss", gulp.series("styles-nano", "build-archive"));
+  gulp.watch(
+    "src/scss/**/*.scss",
+    gulp.series(
+      "styles-nano",
+      "purge-unused-css",
+      "fix-version",
+      "build-archive"
+    )
+  );
   gulp.watch("src/manifest.json", gulp.series("fix-version", "build-archive"));
-  gulp.watch("windows/*.*", gulp.series("build-archive"));
+  gulp.watch(
+    "windows/*.*",
+    gulp.series(
+      "styles-nano",
+      "purge-unused-css",
+      "fix-version",
+      "build-archive"
+    )
+  );
   gulp.watch("package.json", gulp.series("fix-version", "build-archive"));
   gulp.watch(
     "src/scripts/**/*.js",
@@ -51,5 +79,11 @@ gulp.task("default", function () {
 
 gulp.task(
   "deploy",
-  gulp.series("minify-scripts", "styles-nano", "fix-version", "build-archive")
+  gulp.series(
+    "minify-scripts",
+    "styles-nano",
+    "purge-unused-css",
+    "fix-version",
+    "build-archive"
+  )
 );

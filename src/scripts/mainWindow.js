@@ -3,8 +3,8 @@
 /// <reference path="date.js" />
 /// <reference path="log.js" />
 /// <reference path="utils.js" />
-/// <reference path="bootstrap.min.js" />
-/// <reference path="chartist.min.js" />
+/// <reference path="../../resources/scripts/bootstrap.min.js" />
+/// <reference path="../../resources/scripts/chartist.min.js" />
 
 const backgroundWindow = overwolf.windows.getMainWindow();
 
