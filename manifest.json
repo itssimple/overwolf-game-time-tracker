@@ -13,7 +13,10 @@
     "splash_image": "resources/images/splash.png",
     "launcher_icon": "resources/images/gtt-logo.ico"
   },
-  "permissions": ["GameInfo", "Extensions"],
+  "permissions": [
+    "GameInfo",
+    "Extensions"
+  ],
   "data": {
     "game_targeting": {
       "type": "all"
@@ -69,12 +72,15 @@
         "include_launchers": true
       }
     ],
-    "game_events": [10902],
+    "game_events": [
+      10902
+    ],
     "disable_dt": true,
     "developer": {
       "enable_auto_refresh": true,
       "reload_delay": 1000,
       "filter": "*.js;*.html;*.css"
     }
-  }
+  },
+  "version": "0.0.7"
 }

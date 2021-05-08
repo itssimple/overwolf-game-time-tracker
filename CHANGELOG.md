@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.7](https://github.com/itssimple/overwolf-game-time-tracker/compare/v0.0.6...v0.0.7) (2021-05-08)
+
+
+### Features
+
+* Game summary window, now showing all your sessions ([11c4e1b](https://github.com/itssimple/overwolf-game-time-tracker/commit/11c4e1b62b616c590f877e9036e5cdd0a103d3eb))
+
+
+### Bug Fixes
+
+* Fixes overflow for game summary, so that we get the scrollbar in the correct position. ([d6d5b01](https://github.com/itssimple/overwolf-game-time-tracker/commit/d6d5b0164f051dc93fe7e4cb5eacfcb2cad07712))
+
 ### 0.0.6 (2021-05-08)
 
 
