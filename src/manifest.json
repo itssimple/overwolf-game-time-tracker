@@ -4,7 +4,7 @@
   "meta": {
     "name": "Game Time Tracker",
     "description": "This application enables you to track how much time you spend in your games. Features pretty graphs and tasty stats!",
-    "version": "0.0.5",
+    "version": "$VERSION$",
     "author": "NoLifeKing85",
     "minimum-overwolf-version": "0.159.0",
     "icon": "resources/images/logo.png",
