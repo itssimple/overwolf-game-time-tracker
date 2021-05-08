@@ -1,0 +1,92 @@
+:root {
+  --default-backgroundcolor: #515960;
+  --darker-background: #272b30;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: var(--darker-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--default-backgroundcolor);
+}
+
+#main-win-container {
+  overflow-y: scroll;
+  max-height: 682px;
+}
+
+body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.desktop {
+  display: flex;
+  height: 100vh;
+}
+
+#gameStarts div {
+  margin-bottom: 2px;
+}
+
+.statsColumn {
+  margin-left: 10px;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  min-width: 300px;
+  max-width: 100%;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+}
+
+#weekSummaryGraph {
+  background-color: #272b30;
+}
+
+#sessionStats td {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.ct-label {
+  color: white;
+}
+
+.ct-grid {
+  stroke: rgba(255, 255, 255, 0.2);
+}
+
+.ct-bar {
+  stroke-width: 50px;
+  stroke: var(--default-backgroundcolor) !important;
+}
+
+* {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.navbar {
+  padding-left: unset;
+  padding-right: 1rem;
+  background-color: var(--default-backgroundcolor) !important;
+}
