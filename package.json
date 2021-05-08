@@ -4,6 +4,9 @@
   "repository": "https://github.com/itssimple/overwolf-game-time-tracker.git",
   "author": "Chris Gårdenberg <webmaster@itssimple.se>",
   "license": "MIT",
+  "scripts": {
+    "release": "yarn standard-version && yarn gulp build-archive && git commit -am \"chore: version bump\" && git push --follow-tags origin master"
+  },
   "dependencies": {
     "gulp": "^4.0.2",
     "gulp-clean-css": "^4.3.0",

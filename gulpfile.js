@@ -41,6 +41,7 @@ gulp.task("build-archive", function (callback) {
 gulp.task("default", function () {
   gulp.watch("src/scss/**/*.scss", gulp.series("styles-nano", "build-archive"));
   gulp.watch("src/manifest.json", gulp.series("fix-version", "build-archive"));
+  gulp.watch("windows/*.*", gulp.series("build-archive"));
   gulp.watch("package.json", gulp.series("fix-version", "build-archive"));
   gulp.watch(
     "src/scripts/**/*.js",
