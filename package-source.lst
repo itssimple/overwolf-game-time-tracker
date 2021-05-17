@@ -1,3 +1,4 @@
 resources\*
 windows\*
+plugin\*
 manifest.json

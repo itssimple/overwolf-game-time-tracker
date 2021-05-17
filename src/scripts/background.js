@@ -6,6 +6,8 @@ var firstLaunch = true;
 
 var mainWindowId = null;
 
+var gameDetector = null;
+
 function openWindow(event, originEvent) {
   if (event) {
     log("[WINDOW]", "Got launch event: ", event);
@@ -166,6 +168,18 @@ if (firstLaunch) {
           }
         });
       }
+
+      log("[GAMEDETECTOR]", "Initializing GameDetector plugin");
+
+      overwolf.extensions.current.getExtraObject("game-detector", (result) => {
+        if (result.status == "success") {
+          gameDetector = result.object;
+
+          gameDetector.LoadGameDBData(function (data) {
+            log("[GAMEDETECTOR]", "Loaded data from server", data);
+          });
+        }
+      });
 
       log("[DATABASE]", "Done initializing the database");
 
