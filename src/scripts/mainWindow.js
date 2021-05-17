@@ -166,8 +166,6 @@ function loadLatestSessions() {
         true
       );
 
-      console.log(allGamesArray);
-
       for (let game of allGamesArray) {
         let _game = game[1];
 
@@ -199,30 +197,27 @@ function loadLatestSessions() {
 
       let weekObject = getTimeObject(sevenDays);
 
-      let hours = "";
-      if (weekObject.hours && weekObject.hours === 1) {
-        hours = `${weekObject.hours} hour and `;
-      } else if (weekObject.hours > 1) {
-        hours = `${weekObject.hours} hours and `;
-      }
+      let days =
+        weekObject.days >= 1
+          ? `${pluralize(weekObject.days, "day", "days")} and `
+          : "";
 
-      let minutes = "";
-      if (weekObject.minutes && weekObject.minutes === 1) {
-        minutes = `${weekObject.minutes} minute`;
-      } else if (weekObject.minutes > 1) {
-        minutes = `${weekObject.minutes} minutes`;
-      }
+      let hours =
+        weekObject.hours >= 1
+          ? `${pluralize(weekObject.hours, "hour", "hours")} and `
+          : "";
+
+      let minutes =
+        weekObject.minutes >= 1
+          ? `${pluralize(weekObject.minutes, "minute", "minutes")}`
+          : "";
 
       let seconds = "";
       if (minutes == "" && hours == "") {
-        if (weekObject.seconds == 1) {
-          seconds = "one second";
-        } else if (weekObject.seconds > 1) {
-          seconds = `${weekObject.seconds} seconds`;
-        }
+        seconds = pluralize(weekObject.minutes, "second", "seconds");
       }
 
-      weekSummary.innerHTML = `The last 7 days you spent ${hours}${minutes}${seconds} in-game.`;
+      weekSummary.innerHTML = `The last 7 days you spent ${days}${hours}${minutes}${seconds} in-game.`;
 
       renderGraph(allSessions);
     }
