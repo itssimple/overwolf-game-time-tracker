@@ -45,8 +45,6 @@ function sortDictionaryByPropertyAlphabetically(
     newItems.push([key, internal.filter((v) => v[0] == key)[0][1]]);
   }
 
-  console.log(newItems);
-
   return newItems;
 }
 
@@ -125,4 +123,15 @@ function getTimeObject(differenceInSeconds) {
     minutes,
     seconds,
   };
+}
+
+/**
+ *
+ * @param {Number} count
+ * @param {String} singular
+ * @param {String} plural
+ * @returns {String} pluralized string
+ */
+function pluralize(count, singular, plural) {
+  return `${count} ${count === 1 ? singular : plural}`;
 }
