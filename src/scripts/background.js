@@ -263,7 +263,7 @@ if (firstLaunch) {
   });
 
   window.eventEmitter.addEventListener("game-launched", function (gameInfo) {
-    db.newGameSession(gameInfo);
+    db.newGameSession(gameInfo, true, true);
   });
 
   window.eventEmitter.addEventListener("game-exited", function (gameInfo) {
