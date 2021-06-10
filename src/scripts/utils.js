@@ -1,8 +1,8 @@
 /**
  * Shortens the text if it's longer than the max length
- * @param {String} string
- * @param {Number} maxLength
- * @returns {String}
+ * @param {string} string
+ * @param {number} maxLength
+ * @returns {string}
  */
 function shorten(string, maxLength) {
   if (string.length > maxLength) {
