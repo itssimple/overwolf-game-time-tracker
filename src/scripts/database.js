@@ -2,7 +2,7 @@ function GameTimeTrackerDatabase() {
   this.DBInstance = null;
 
   this.initializeDatabase = function (finishedLoadingCallback = null) {
-    let dbRequest = window.indexedDB.open("gameTimeTracker", 2);
+    let dbRequest = window.indexedDB.open("gameTimeTracker", 3);
 
     dbRequest.onupgradeneeded = function (event) {
       const db = dbRequest.result;
@@ -36,8 +36,7 @@ function GameTimeTrackerDatabase() {
           .objectStore("gameSessions")
           .createIndex("by_isGameSession", "isGame");
 
-        var gttSettingsStore =
-          upgradeTransaction.createObjectStore("gttSettings");
+        var gttSettingsStore = db.createObjectStore("gttSettings");
 
         gttSettingsStore.createIndex("by_settingsId", "settingsId");
       }
@@ -143,10 +142,57 @@ function GameTimeTrackerDatabase() {
     };
   };
 
+  this.getSettings = function (resultCallback) {
+    log("[DB:SETTINGS]", "Fetching settings");
+    this.DBInstance.transaction("gttSettings", "readwrite")
+      .objectStore("gttSettings")
+      .openCursor().onsuccess = function (event) {
+      var cursor = event.target.result;
+      log("[DB:SETTINGS]", "Got response", cursor ? cursor.value : null);
+      if (resultCallback) {
+        resultCallback(cursor ? cursor.value : null);
+      }
+    };
+  };
+
+  this.insertNewSetting = function (settingsObject, resultCallback) {
+    log("[DB:SETTINGS]", "Creating new settings object", settingsObject);
+    this.DBInstance.transaction("gttSettings", "readwrite")
+      .objectStore("gttSettings")
+      .add(settingsObject, 1);
+
+    this.getSettings(resultCallback);
+  };
+
+  this.updateSetting = function (settingsObject, resultCallback) {
+    log("[DB:SETTINGS]", "Updating settings object", settingsObject);
+    this.DBInstance.transaction("gttSettings", "readwrite")
+      .objectStore("gttSettings")
+      .openCursor().onsuccess = function (event) {
+      var cursor = event.target.result;
+      if (cursor) {
+        const updateSession = cursor.value;
+
+        if (settingsObject.experimentalGameTracking !== undefined) {
+          updateSession.experimentalGameTracking =
+            settingsObject.experimentalGameTracking;
+        }
+
+        cursor.update(updateSession);
+      }
+    };
+    this.getSettings(resultCallback);
+  };
+
   this.setSettings = function (settingsObject, resultCallback) {
-    this.DBInstance.transaction("gttSettings", "readwrite").objectStore(
-      "gttSettings"
-    );
+    this.getSettings((settings) => {
+      log("[DB:SETTINGS]", settings, settingsObject);
+      if (!settings) {
+        this.insertNewSetting(settingsObject, resultCallback);
+      } else {
+        this.updateSetting(settingsObject, resultCallback);
+      }
+    });
   };
 
   this.getSessions = function (resultCallback) {

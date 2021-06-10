@@ -8,6 +8,8 @@ var mainWindowId = null;
 
 var gameDetector = null;
 
+window.gttSettings = null;
+
 function openWindow(event, originEvent) {
   if (event) {
     log("[WINDOW]", "Got launch event: ", event);
@@ -162,7 +164,10 @@ if (firstLaunch) {
             overwolf.games.getRunningGameInfo(function (data) {
               if (!data) {
                 // No game is running, so we'll just exit the application again, so we don't take any resources
-                window.eventEmitter.emit("shutdown", null);
+                window.eventEmitter.emit(
+                  "shutdown",
+                  "No game is running, we finished cleanup of unfinished sessions"
+                );
               }
             });
           }
@@ -200,7 +205,10 @@ if (firstLaunch) {
         overwolf.games.getRunningGameInfo(function (data) {
           if (!data) {
             // No game is running, so we'll just exit the application again, so we don't take any resources
-            window.eventEmitter.emit("shutdown", null);
+            window.eventEmitter.emit(
+              "shutdown",
+              "Launched by game event, but no game is present, exiting"
+            );
           } else {
             gameLaunched(data);
           }
@@ -276,7 +284,10 @@ if (firstLaunch) {
     db.updateGameSession(gameInfo);
 
     if (!mainWindowId) {
-      window.eventEmitter.emit("shutdown", null);
+      window.eventEmitter.emit(
+        "shutdown",
+        "Main window not open or hidden, closing application"
+      );
       return;
     }
 
@@ -285,15 +296,23 @@ if (firstLaunch) {
         state.success &&
         (state.window_state_ex == "closed" || state.window_state_ex == "hidden")
       ) {
-        window.eventEmitter.emit("shutdown", null);
+        window.eventEmitter.emit(
+          "shutdown",
+          "Main window not open or hidden, closing application"
+        );
       }
     });
   });
 
-  window.eventEmitter.addEventListener("shutdown", function () {
-    log("[EXIT]", "Got told to exit the application, doing that!");
-    overwolf.windows.getCurrentWindow(function (window) {
-      overwolf.windows.close(window.window.id, function () {});
+  window.eventEmitter.addEventListener("shutdown", function (reason) {
+    log("[EXIT]", "Supposed to exit:", reason);
+    db.getSettings((settings) => {
+      if (settings == null || !settings.experimentalGameTracking) {
+        log("[EXIT]", reason);
+        overwolf.windows.getCurrentWindow(function (window) {
+          overwolf.windows.close(window.window.id, function () {});
+        });
+      }
     });
   });
 

@@ -299,7 +299,18 @@ function onOwAdReady() {
   });
 }*/
 
+function loadSettings() {
+  db.getSettings((_settings) => {
+    if (_settings) {
+      if (_settings.experimentalGameTracking) {
+        document.getElementById("settingsExperimentalTracking").checked = true;
+      }
+    }
+  });
+}
+
 (function () {
+  loadSettings();
   loadLatestSessions();
 
   overwolf.windows.getCurrentWindow(function (window) {
@@ -309,8 +320,10 @@ function onOwAdReady() {
       .addEventListener("click", function () {
         overwolf.games.getRunningGameInfo(function (data) {
           if (!data) {
-            log("[Exit]", "No games are running, exiting application");
-            eventEmitter.emit("shutdown", null);
+            eventEmitter.emit(
+              "shutdown",
+              "No running game while clicking exit button"
+            );
           }
         });
 
@@ -327,10 +340,12 @@ function onOwAdReady() {
       .getElementById("settingsExperimentalTracking")
       .addEventListener("change", function (event) {
         let experimentalEnabled = event.target.checked;
-        console.log(experimentalEnabled);
-        /*db.setSettings({
-          experimentalGameTracking: experimentalEnabled
-        });*/
+        db.setSettings(
+          {
+            experimentalGameTracking: experimentalEnabled,
+          },
+          console.log
+        );
       });
   });
 })();
