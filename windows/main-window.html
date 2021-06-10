@@ -10,24 +10,29 @@
     />
     <link
       type="text/css"
-      href="../resources/css/bootstrap.min.css"
+      href="../resources/compiled/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <link
       type="text/css"
-      href="../resources/css/main-window.css"
+      href="../resources/compiled/css/main-window.css"
+      rel="stylesheet"
+    />
+    <link
+      type="text/css"
+      href="../resources/compiled/css/window-styles.css"
       rel="stylesheet"
     />
     <script
       type="text/javascript"
-      src="../resources/scripts/draggable-window.js"
+      src="../resources/compiled/scripts/draggable-window.js"
     ></script>
-    <script type="text/javascript" src="../resources/scripts/utils.js"></script>
-    <script type="text/javascript" src="../resources/scripts/log.js"></script>
-    <script type="text/javascript" src="../resources/scripts/date.js"></script>
+    <script type="text/javascript" src="../resources/compiled/scripts/utils.js"></script>
+    <script type="text/javascript" src="../resources/compiled/scripts/log.js"></script>
+    <script type="text/javascript" src="../resources/compiled/scripts/date.js"></script>
     <script
       type="text/javascript"
-      src="../resources/scripts/mainWindow.js"
+      src="../resources/compiled/scripts/mainWindow.js"
     ></script>
   </head>
   <body>
@@ -35,6 +40,9 @@
       <span class="navbar-brand text-white text-bold" id="titleBarName"
         >Game Time Tracker</span
       >
+      <span class="currentlyPlaying">
+        Currently playing: Nothing at all!
+      </span>
       <button class="btn btn-primary btn-sm" id="exitButton">X</button>
     </nav>
     <ul class="nav nav-tabs" id="main-navigation" role="tablist">
@@ -47,8 +55,7 @@
           role="tab"
           aria-controls="home"
           aria-selected="true"
-          >Dashboard</a
-        >
+        >Dashboard</a>
       </li>
       <li class="nav-item" role="presentation">
         <a
@@ -59,8 +66,17 @@
           role="tab"
           aria-controls="summary"
           aria-selected="true"
-          >Game summary</a
-        >
+        >Game summary</a>
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          class="nav-link"
+          id="settings-tab"
+          data-toggle="tab"
+          href="#settings"
+          aria-controls="settings"
+          aria-selected="true"
+        >Settings</a>
       </li>
     </ul>
     <div class="container-fluid h-80" id="main-win-container">
@@ -191,6 +207,26 @@
                       </thead>
                       <tbody id="summaryStats"></tbody>
                     </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+          <div class="row h-100">
+            <div class="col-12 pt-2">
+              <div class="card text-white border-secondary mb-3">
+                <div class="card-header">
+                  Here you can change how Game Time Tracker works, a little bit at least!
+                </div>
+                <div class="card-body">
+                  <div class="custom-control custom-switch">
+                      <input type="checkbox" class="custom-control-input" id="settingsExperimentalTracking">
+                      <label for="settingsExperimentalTracking" class="custom-control-label">
+                        Allow experimental game tracking mode
+                      </label>
+                    <small class="form-text text-muted">This will make this app stay active in the background even when you close all games and this window, to enable Game Time Tracker to scan for processes that might be games, that is not yet supported by Overwolf.</small>
                   </div>
                 </div>
               </div>
