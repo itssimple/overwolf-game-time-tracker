@@ -1,1 +1,0 @@
-function EventEmitter(){return this.eventListeners=[],this.addEventListener=function(e,t){log("[EVENT:REGISTERED]",e),this.eventListeners.push({eventName:e,handler:t})},this.emit=function(t,arguments){this.eventListeners.filter(e=>e.eventName==t).forEach(e=>{e.handler(arguments)})},this}

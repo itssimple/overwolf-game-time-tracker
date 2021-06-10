@@ -1,1 +1,0 @@
-function log(o,...n){console.log(o,JSON.stringify([...n]))}

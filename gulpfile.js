@@ -19,7 +19,7 @@ gulp.task("styles-nano", function () {
     .src("src/scss/*.scss")
     .pipe(sass().on("error", sass.logError))
     .pipe(cleancss())
-    .pipe(gulp.dest("resources/css/"));
+    .pipe(gulp.dest("resources/compiled/css/"));
 });
 
 gulp.task("purge-unused-css", function () {
@@ -30,14 +30,14 @@ gulp.task("purge-unused-css", function () {
         content: ["windows/**/*.html", "src/scripts/**/*.js"],
       })
     )
-    .pipe(gulp.dest("resources/css"));
+    .pipe(gulp.dest("resources/compiled/css/"));
 });
 
 gulp.task("minify-scripts", function () {
   return gulp
     .src("src/scripts/*.js")
     .pipe(uglify())
-    .pipe(gulp.dest("resources/scripts/"));
+    .pipe(gulp.dest("resources/compiled/scripts/"));
 });
 
 gulp.task("build-archive", function (callback) {
