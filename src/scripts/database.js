@@ -26,6 +26,21 @@ function GameTimeTrackerDatabase() {
           .objectStore("gameSessions")
           .createIndex("by_startdate", "startDate");
       }
+
+      if (event.oldVersion < 3) {
+        upgradeTransaction
+          .objectStore("gameSessions")
+          .createIndex("by_possibleGameSession", "isPossibleGame");
+
+        upgradeTransaction
+          .objectStore("gameSessions")
+          .createIndex("by_isGameSession", "isGame");
+
+        var gttSettingsStore =
+          upgradeTransaction.createObjectStore("gttSettings");
+
+        gttSettingsStore.createIndex("by_settingsId", "settingsId");
+      }
     };
 
     dbRequest.onsuccess = function () {
@@ -37,7 +52,7 @@ function GameTimeTrackerDatabase() {
       }
     };
   };
-  this.newGameSession = function (gameInfo) {
+  this.newGameSession = function (gameInfo, isGame, isPossibleGame) {
     this.DBInstance.transaction("gameSessions", "readwrite")
       .objectStore("gameSessions")
       .add({
@@ -46,6 +61,8 @@ function GameTimeTrackerDatabase() {
         gameTitle: gameInfo.title,
         startDate: Date.now(),
         endDate: null,
+        isGame: isGame,
+        isPossibleGame: isPossibleGame,
       });
   };
 
@@ -107,6 +124,14 @@ function GameTimeTrackerDatabase() {
           updateSession.startDate = sessionData.startDate;
         }
 
+        if (sessionData.isGame) {
+          updateSession.isGame = sessionData.isGame;
+        }
+
+        if (sessionData.isPossibleGame) {
+          updateSession.isPossibleGame = sessionData.isPossibleGame;
+        }
+
         cursor.update(updateSession);
 
         if (updateComplete) {
@@ -116,6 +141,12 @@ function GameTimeTrackerDatabase() {
         return;
       }
     };
+  };
+
+  this.setSettings = function (settingsObject, resultCallback) {
+    this.DBInstance.transaction("gttSettings", "readwrite").objectStore(
+      "gttSettings"
+    );
   };
 
   this.getSessions = function (resultCallback) {

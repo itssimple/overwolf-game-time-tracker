@@ -15,6 +15,9 @@ const db = backgroundWindow.db;
 
 var activeGameTicker = null;
 
+var overwolfAdvertiseObject = null;
+var overwolfAdvertiseInitialized = false;
+
 eventEmitter.addEventListener("game-launched", function () {
   activeGameTicker = setInterval(loadLatestSessions, 5000);
   loadLatestSessions();
@@ -273,6 +276,19 @@ function renderGraph(data) {
   }, 200);
 }
 
+/*
+function onOwAdReady() {
+  if (!OwAd) {
+    // TODO: Handle fallback if the OwAd-API doesn't load
+    return;
+  }
+
+  overwolfAdvertiseObject = new OwAd(document.getElementById("ow_ad"));
+  overwolfAdvertiseObject.addEventListener("ow_internal_rendered", () => {
+    overwolfAdvertiseInitialized = true;
+  });
+}*/
+
 (function () {
   loadLatestSessions();
 
@@ -296,5 +312,15 @@ function renderGraph(data) {
         "titleBarName"
       ).innerHTML = `Game Time Tracker - v${app.meta.version}`;
     });
+
+    document
+      .getElementById("settingsExperimentalTracking")
+      .addEventListener("change", function (event) {
+        let experimentalEnabled = event.target.checked;
+        console.log(experimentalEnabled);
+        /*db.setSettings({
+          experimentalGameTracking: experimentalEnabled
+        });*/
+      });
   });
 })();
