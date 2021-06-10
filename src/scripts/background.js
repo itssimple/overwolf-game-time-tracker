@@ -195,7 +195,7 @@ if (firstLaunch) {
         location.search.indexOf("source=tray") > -1
       ) {
         openWindow(null, location.search);
-      } else if (location.search.indexOf("source=gamelaunchevent")) {
+      } else if (location.search.indexOf("source=gamelaunchevent") > -1) {
         log("[GAME:LAUNCH]", "Application was started by game");
         overwolf.games.getRunningGameInfo(function (data) {
           if (!data) {
@@ -203,6 +203,12 @@ if (firstLaunch) {
             window.eventEmitter.emit("shutdown", null);
           } else {
             gameLaunched(data);
+          }
+        });
+      } else {
+        overwolf.extensions.current.getManifest((manifest) => {
+          if (manifest.has_devtools) {
+            openWindow(null, location.search);
           }
         });
       }

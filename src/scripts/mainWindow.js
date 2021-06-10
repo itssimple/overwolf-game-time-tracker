@@ -46,6 +46,8 @@ function loadLatestSessions() {
     let topGameTitle = document.querySelector("#topGameTitle");
     let topGameTime = document.querySelector("#topGameTime");
 
+    let totalGameTime = document.querySelector("#totalGameTime");
+
     let gameStarts = document.querySelector("#gameStarts");
 
     let weekSummary = document.querySelector("#weekSummaryText");
@@ -66,6 +68,8 @@ function loadLatestSessions() {
 
       topGameTitle.innerHTML = shorten("No games played yet", 45);
       topGameTime.innerHTML = "";
+
+      totalGameTime.innerHTML = "No games played yet";
 
       renderGraph(null);
     } else {
@@ -169,12 +173,16 @@ function loadLatestSessions() {
         true
       );
 
+      let totalTimeSum = 0;
+
       for (let game of allGamesArray) {
         let _game = game[1];
 
         let totalGameTime = _game.sessions
           .map((s) => getTimeDifference(s.startDate, s.endDate))
           .reduce((a, b) => a + b);
+
+        totalTimeSum += totalGameTime;
 
         let row = document.createElement("tr");
         row.innerHTML = `
@@ -186,6 +194,8 @@ function loadLatestSessions() {
 
         allSessionTable.appendChild(row);
       }
+
+      totalGameTime.innerHTML = outputTimesObjectFromDifference(totalTimeSum);
 
       window.gameStartItems = gameStartItems;
 
