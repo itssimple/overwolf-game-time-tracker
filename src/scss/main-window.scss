@@ -94,3 +94,7 @@ body {
 .fade {
   transition: opacity 0.08s;
 }
+
+.custom-control-input:checked ~ .custom-control-label::before {
+  background-color: #000;
+}
