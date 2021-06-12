@@ -7,7 +7,7 @@ function EventEmitter() {
    * @param {CallableFunction} eventHandler The method that should run whenever the event occurs
    */
   this.addEventListener = function (eventName, eventHandler) {
-    log(`[EVENT:REGISTERED]`, eventName);
+    log(`EVENT:REGISTERED`, eventName);
     this.eventListeners.push({ eventName: eventName, handler: eventHandler });
   };
 

@@ -10,7 +10,7 @@ var gameDetector = null;
 
 function openWindow(event, originEvent) {
   if (event) {
-    log("[WINDOW]", "Got launch event: ", event);
+    log("WINDOW", "Got launch event: ", event);
   }
 
   if (event && event.origin == "overwolfstartlaunchevent") {
@@ -23,7 +23,7 @@ function openWindow(event, originEvent) {
 
     mainWindowId = result.window.id;
     overwolf.windows.restore(result.window.id);
-    log("[WINDOW]", `Opening window. Reason: ${originEvent}`, event);
+    log("WINDOW", `Opening window. Reason: ${originEvent}`, event);
   });
 }
 
@@ -71,10 +71,10 @@ function gameLaunched(game) {
   if (game) {
     if (window.possibleGameName && window.possibleGameName != null) {
       game.title = window.possibleGameName;
-      log("[GAME:TITLE]", "Custom title", game.title);
+      log("GAME:TITLE", "Custom title", game.title);
     }
 
-    log("[GAME:LAUNCH]", game);
+    log("GAME:LAUNCH", game);
     eventEmitter.emit("game-launched", game);
 
     backgroundGameUpdater = setInterval(function () {
@@ -92,7 +92,7 @@ function gameInfoUpdated(game) {
     !game.gameInfo.isRunning &&
     game.runningChanged
   ) {
-    log("[GAME:UPDATE]", game);
+    log("GAME:UPDATE", game);
     eventEmitter.emit("game-exited", game);
 
     clearInterval(backgroundGameUpdater);
@@ -103,17 +103,17 @@ function gameInfoUpdated(game) {
 window.owSupportedGames = {};
 
 function loadOverwolfGameList() {
-  log("[OVERWOLF]", "Finding latest GamesList-file");
+  log("OVERWOLF", "Finding latest GamesList-file");
   overwolf.io.dir(`${overwolf.io.paths.localAppData}/overwolf`, (dirResult) => {
     if (dirResult && dirResult.success) {
       for (let entry of dirResult.data) {
         if (entry.type === "file" && entry.name.indexOf("GamesList.") > -1) {
-          log("[OVERWOLF]", "Found file: ", entry.name);
+          log("OVERWOLF", "Found file: ", entry.name);
 
           let loadFile = `${overwolf.io.paths.localAppData}/overwolf/${entry.name}`;
           overwolf.io.readTextFile(loadFile, {}, (content) => {
             if (content.success) {
-              log("[OVERWOLF]", "Loading GameList file parsing the results");
+              log("OVERWOLF", "Loading GameList file parsing the results");
               const parser = new DOMParser();
               const document = parser.parseFromString(
                 content.content,
@@ -177,11 +177,13 @@ function loadOverwolfGameList() {
                 window.owSupportedGames[gameId] = game;
               }
 
-              log("[OVERWOLF]", "Done loading Overwolf games");
+              log("OVERWOLF", "Done loading Overwolf games");
             }
           });
         }
       }
+    } else {
+      log("OVERWOLF", "Could not load folder where GameList is supposed to be");
     }
   });
 }
@@ -225,7 +227,7 @@ function setLauncherEvents(finishedSettingFeatures) {
         }, 2000);
         return;
       }
-      log("[LOL-LAUNCHER]", info);
+      log("LOL-LAUNCHER", info);
       if (finishedSettingFeatures) {
         finishedSettingFeatures(info);
       }
@@ -234,21 +236,21 @@ function setLauncherEvents(finishedSettingFeatures) {
 }
 
 function onLauncherLaunched(launcherInfo) {
-  log("[GAME:LAUNCHER]", launcherInfo);
+  log("GAME:LAUNCHER", launcherInfo);
   if (launcherInfo.classId == 10902) {
     setLauncherEvents();
   }
 }
 
 function onLauncherTerminated(result) {
-  log("[GAME:LAUNCHER]", result);
+  log("GAME:LAUNCHER", result);
   window.possibleGameName = null;
 }
 
 function exitApp(reason) {
   overwolf.os.tray.destroy();
 
-  log("[EXIT]", reason);
+  log("EXIT", reason);
   overwolf.windows.getCurrentWindow(function (window) {
     overwolf.windows.close(window.window.id, function () {});
   });
@@ -258,7 +260,7 @@ function checkInterestingProcesses(processList) {}
 
 if (firstLaunch) {
   log(
-    "[INIT]",
+    "INIT",
     "Initializing all event handlers and getting all the recently played games (to see if we missed anything)"
   );
 
@@ -267,7 +269,7 @@ if (firstLaunch) {
   }
 
   if (!window.db) {
-    log("[DATABASE]", "Initializing database");
+    log("DATABASE", "Initializing database");
     window.db = new GameTimeTrackerDatabase();
 
     db.initializeDatabase(function () {
@@ -276,12 +278,12 @@ if (firstLaunch) {
         window.db.getUnfinishedSessions(function (unfinishedSessions) {
           if (unfinishedSessions && unfinishedSessions.length > 0) {
             log(
-              "[SESSION:CLEANUP]",
+              "SESSION:CLEANUP",
               `Found ${unfinishedSessions.length} unfinished sessions to fix.`
             );
 
             for (let session of unfinishedSessions) {
-              log("[SESSION:CLEANUP]", "Unfinished session", session);
+              log("SESSION:CLEANUP", "Unfinished session", session);
 
               // Lets just set it as one minute extra from start right now.
               session.endDate = session.startDate + 60000;
@@ -307,19 +309,19 @@ if (firstLaunch) {
         });
       }
 
-      log("[GAMEDETECTOR]", "Initializing GameDetector plugin");
+      log("GAMEDETECTOR", "Initializing GameDetector plugin");
 
       overwolf.extensions.current.getExtraObject("game-detector", (result) => {
         if (result.status == "success") {
           gameDetector = result.object;
 
           gameDetector.LoadGameDBData(function (data) {
-            log("[GAMEDETECTOR]", "Loaded data from server", data);
+            log("GAMEDETECTOR", "Loaded data from server", data);
 
             db.getSettings((settings) => {
               clearInterval(gameDetectorGameInfoUpdater);
               if (settings && settings.experimentalGameTracking) {
-                log("[GAMEDETECTOR]", "Enabling background updates");
+                log("GAMEDETECTOR", "Enabling background updates");
                 gameDetectorGameInfoUpdater = setInterval(function () {
                   gameDetector.LoadGameDBData();
                 }, 30000);
@@ -343,9 +345,9 @@ if (firstLaunch) {
         }
       });
 
-      log("[DATABASE]", "Done initializing the database");
+      log("DATABASE", "Done initializing the database");
 
-      log("[INIT:LAUNCHREASON]", location.search);
+      log("INIT:LAUNCHREASON", location.search);
 
       if (
         location.search.indexOf("-from-desktop") > -1 ||
@@ -358,7 +360,7 @@ if (firstLaunch) {
       ) {
         openWindow(null, location.search);
       } else if (location.search.indexOf("source=gamelaunchevent") > -1) {
-        log("[GAME:LAUNCH]", "Application was started by game");
+        log("GAME:LAUNCH", "Application was started by game");
         overwolf.games.getRunningGameInfo(function (data) {
           if (!data) {
             // No game is running, so we'll just exit the application again, so we don't take any resources
@@ -464,11 +466,11 @@ if (firstLaunch) {
   });
 
   window.eventEmitter.addEventListener("shutdown", function (reason) {
-    log("[EXIT]", "Supposed to exit:", reason);
+    log("EXIT", "Supposed to exit:", reason);
     db.getSettings((settings) => {
       if (settings && settings.experimentalGameTracking) {
         log(
-          "[EXIT]",
+          "EXIT",
           "Not exiting, since the user uses experimental game tracking."
         );
 
@@ -479,5 +481,5 @@ if (firstLaunch) {
     });
   });
 
-  log("[INIT]", "All eventhandlers have been set");
+  log("INIT", "All eventhandlers have been set");
 }

@@ -7,10 +7,10 @@ function GameTimeTrackerDatabase() {
     dbRequest.onupgradeneeded = function (event) {
       const db = dbRequest.result;
       const upgradeTransaction = event.target.transaction;
-      log("[DB]", "Old", event.oldVersion, "New", event.newVersion);
+      log("DB", "Old", event.oldVersion, "New", event.newVersion);
       if (event.oldVersion < 1) {
         log(
-          "[DB]",
+          "DB",
           "Creating first version of database, since it never existed on this installation."
         );
         const gameSessionStore = db.createObjectStore("gameSessions", {
@@ -43,7 +43,7 @@ function GameTimeTrackerDatabase() {
     };
 
     dbRequest.onsuccess = function () {
-      log("[DB]", "Loaded database");
+      log("DB", "Loaded database");
       window.db.DBInstance = dbRequest.result;
 
       if (finishedLoadingCallback) {
@@ -143,12 +143,12 @@ function GameTimeTrackerDatabase() {
   };
 
   this.getSettings = function (resultCallback) {
-    log("[DB:SETTINGS]", "Fetching settings");
+    log("DB:SETTINGS", "Fetching settings");
     this.DBInstance.transaction("gttSettings", "readwrite")
       .objectStore("gttSettings")
       .openCursor().onsuccess = function (event) {
       var cursor = event.target.result;
-      log("[DB:SETTINGS]", "Got response", cursor ? cursor.value : null);
+      log("DB:SETTINGS", "Got response", cursor ? cursor.value : null);
       if (resultCallback) {
         resultCallback(cursor ? cursor.value : null);
       }
@@ -156,7 +156,7 @@ function GameTimeTrackerDatabase() {
   };
 
   this.insertNewSetting = function (settingsObject, resultCallback) {
-    log("[DB:SETTINGS]", "Creating new settings object", settingsObject);
+    log("DB:SETTINGS", "Creating new settings object", settingsObject);
     this.DBInstance.transaction("gttSettings", "readwrite")
       .objectStore("gttSettings")
       .add(settingsObject, 1);
@@ -165,7 +165,7 @@ function GameTimeTrackerDatabase() {
   };
 
   this.updateSetting = function (settingsObject, resultCallback) {
-    log("[DB:SETTINGS]", "Updating settings object", settingsObject);
+    log("DB:SETTINGS", "Updating settings object", settingsObject);
     this.DBInstance.transaction("gttSettings", "readwrite")
       .objectStore("gttSettings")
       .openCursor().onsuccess = function (event) {
@@ -186,7 +186,7 @@ function GameTimeTrackerDatabase() {
 
   this.setSettings = function (settingsObject, resultCallback) {
     this.getSettings((settings) => {
-      log("[DB:SETTINGS]", settings, settingsObject);
+      log("DB:SETTINGS", settings, settingsObject);
       if (!settings) {
         this.insertNewSetting(settingsObject, resultCallback);
       } else {
