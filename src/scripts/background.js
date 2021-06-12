@@ -280,27 +280,30 @@ function exitApp(reason) {
   });
 }
 
+var otherGameProcess = null;
+
 function checkInterestingProcesses(processList) {
-  let foundGame = null;
   if (processList && processList.length > 0) {
     for (let process of processList) {
       if (process.Application) {
         let owSupport = isOwSupportedGame(process.Application.ProcessPath);
         if (owSupport && owSupport.injectionDecision !== "Supported") {
-          foundGame = {
+          otherGameProcess = {
             classId: owSupport.classId,
             title: owSupport.gameTitle,
             isGame: true,
             isPossibleGame: true,
+            sessionId: null,
           };
         } else if (!owSupport) {
           let gttGame = isGTTSupportedGame(process.Application.ProcessPath);
           if (gttGame) {
-            foundGame = {
+            otherGameProcess = {
               classId: `gtt-${gttGame.Id}`,
               title: gttGame.DisplayName,
               isGame: true,
               isPossibleGame: true,
+              sessionId: null,
             };
           }
         }
@@ -308,12 +311,13 @@ function checkInterestingProcesses(processList) {
     }
   }
 
-  if (foundGame && foundGame != null) {
-    getOpenGameSessions(foundGame.classId, (openSession) => {
+  if (otherGameProcess && otherGameProcess != null) {
+    getOpenGameSessions(otherGameProcess.classId, (openSession) => {
       if (!openSession) {
         // Create new session
-        foundGame.sessionId = generateUUID();
-        gameLaunched(foundGame);
+        otherGameProcess.sessionId = generateUUID();
+        otherGameProcess = otherGameProcess;
+        gameLaunched(otherGameProcess);
       } else {
         // This is an un-ended session with the same classId, let's pretend its the same session
       }
@@ -432,9 +436,17 @@ if (firstLaunch) {
                         processes.InterestingApplications
                       );
                     } else {
+                      if (otherGameProcess) {
+                        otherGameProcess.isRunning = false;
+                        gameInfoUpdated({
+                          gameInfo: otherGameProcess,
+                          runningChanged: true,
+                        });
+                        otherGameProcess = null;
+                      }
                     }
                   });
-                }, 5000);
+                }, 10000);
               }
             });
           });
