@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.1.0...v1.1.1) (2021-06-12)
+
+
+### Bug Fixes
+
+* Safety harness for shutting down games ([035c508](https://github.com/itssimple/overwolf-game-time-tracker/commit/035c508335f045d7ccaa357003b1bef2817c70e4))
+
 ## [1.1.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v0.0.7...v1.1.0) (2021-06-12)
 
 
