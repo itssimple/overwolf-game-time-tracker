@@ -13,7 +13,14 @@
     "splash_image": "resources/images/splash.png",
     "launcher_icon": "resources/images/gtt-logo.ico"
   },
-  "permissions": ["GameInfo", "Extensions"],
+  "permissions": [
+    "GameInfo",
+    "Extensions",
+    "FileSystem",
+    "Profile",
+    "Streaming",
+    "Tray"
+  ],
   "data": {
     "game_targeting": {
       "type": "all"

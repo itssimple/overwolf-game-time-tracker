@@ -8,8 +8,6 @@ var mainWindowId = null;
 
 var gameDetector = null;
 
-window.gttSettings = null;
-
 function openWindow(event, originEvent) {
   if (event) {
     log("[WINDOW]", "Got launch event: ", event);
@@ -29,7 +27,45 @@ function openWindow(event, originEvent) {
   });
 }
 
+const trayMenu = {
+  menu_items: [
+    {
+      label: "Open Game Time Tracker",
+      id: "open_gtt_mainWindow",
+    },
+    {
+      label: "-",
+    },
+    {
+      label: "Exit",
+      id: "exit_gtt",
+    },
+  ],
+};
+
+overwolf.os.tray.setMenu(trayMenu, (res) => {
+  // Ignore if we don't manage to create it
+});
+
+overwolf.os.tray.onTrayIconDoubleClicked.addListener(() => {
+  openWindow(null, "tray_icon");
+});
+
+overwolf.os.tray.onMenuItemClicked.addListener((event) => {
+  switch (event.item) {
+    case "open_gtt_mainWindow":
+      openWindow(null, "tray_menu");
+      break;
+    case "exit_gtt":
+      exitApp("Clicked exit-menu item");
+      break;
+  }
+});
+
 var backgroundGameUpdater = null;
+
+var gameDetectorGameInfoUpdater = null;
+var gameDetectorGameSessionDetector = null;
 
 function gameLaunched(game) {
   if (game) {
@@ -62,6 +98,92 @@ function gameInfoUpdated(game) {
     clearInterval(backgroundGameUpdater);
     backgroundGameUpdater = null;
   }
+}
+
+window.owSupportedGames = {};
+
+function loadOverwolfGameList() {
+  log("[OVERWOLF]", "Finding latest GamesList-file");
+  overwolf.io.dir(`${overwolf.io.paths.localAppData}/overwolf`, (dirResult) => {
+    if (dirResult && dirResult.success) {
+      for (let entry of dirResult.data) {
+        if (entry.type === "file" && entry.name.indexOf("GamesList.") > -1) {
+          log("[OVERWOLF]", "Found file: ", entry.name);
+
+          let loadFile = `${overwolf.io.paths.localAppData}/overwolf/${entry.name}`;
+          overwolf.io.readTextFile(loadFile, {}, (content) => {
+            if (content.success) {
+              log("[OVERWOLF]", "Loading GameList file parsing the results");
+              const parser = new DOMParser();
+              const document = parser.parseFromString(
+                content.content,
+                "application/xml"
+              );
+
+              let allGameInfo = document.querySelectorAll("GameInfo");
+
+              for (let gameInfo of allGameInfo) {
+                let game = {};
+
+                let injectionDecisionElement =
+                  gameInfo.querySelector("InjectionDecision");
+
+                let injectionDecision = "NotSupported";
+
+                if (injectionDecisionElement) {
+                  injectionDecision = injectionDecisionElement.textContent;
+                }
+
+                let ignoreThisGame = false;
+
+                switch (injectionDecision) {
+                  case "Supported":
+                    //ignoreThisGame = true;
+                    break;
+                }
+
+                if (ignoreThisGame) {
+                  continue;
+                }
+
+                let gameTitle = gameInfo.querySelector("GameTitle").textContent;
+
+                let gameId = parseInt(
+                  parseInt(gameInfo.querySelector("ID").textContent, 0) / 10
+                );
+
+                game.gameTitle = gameTitle;
+                game.processNames = [];
+                game.injectionDecision = injectionDecision;
+
+                let launcherNames = gameInfo.querySelectorAll(
+                  "LuancherNames string"
+                );
+                for (let launcher of launcherNames) {
+                  if (!game.processNames.includes(launcher.textContent)) {
+                    game.processNames.push(launcher.textContent);
+                  }
+                }
+
+                let processNames = gameInfo.querySelectorAll(
+                  "ProcessNames string"
+                );
+                for (let process of processNames) {
+                  if (!game.processNames.includes(process.textContent)) {
+                    game.processNames.push(process.textContent);
+                  }
+                }
+
+                window.owSupportedGames[gameId] = game;
+              }
+
+              log("[OVERWOLF]", "Done loading Overwolf games");
+            }
+          });
+        }
+      }
+    }
+  });
 }
 
 /**
@@ -123,6 +245,17 @@ function onLauncherTerminated(result) {
   window.possibleGameName = null;
 }
 
+function exitApp(reason) {
+  overwolf.os.tray.destroy();
+
+  log("[EXIT]", reason);
+  overwolf.windows.getCurrentWindow(function (window) {
+    overwolf.windows.close(window.window.id, function () {});
+  });
+}
+
+function checkInterestingProcesses(processList) {}
+
 if (firstLaunch) {
   log(
     "[INIT]",
@@ -182,6 +315,30 @@ if (firstLaunch) {
 
           gameDetector.LoadGameDBData(function (data) {
             log("[GAMEDETECTOR]", "Loaded data from server", data);
+
+            db.getSettings((settings) => {
+              clearInterval(gameDetectorGameInfoUpdater);
+              if (settings && settings.experimentalGameTracking) {
+                log("[GAMEDETECTOR]", "Enabling background updates");
+                gameDetectorGameInfoUpdater = setInterval(function () {
+                  gameDetector.LoadGameDBData();
+                }, 30000);
+
+                gameDetectorGameSessionDetector = setInterval(function () {
+                  gameDetector.CheckProcesses((processes) => {
+                    if (
+                      processes &&
+                      processes.InterestingApplications.length > 0
+                    ) {
+                      checkInterestingProcesses(
+                        processes.InterestingApplications
+                      );
+                    } else {
+                    }
+                  });
+                }, 5000);
+              }
+            });
           });
         }
       });
@@ -227,6 +384,8 @@ if (firstLaunch) {
         window.title,
         location.href.replace(location.search, "")
       );
+
+      loadOverwolfGameList();
     });
   }
 
@@ -307,12 +466,16 @@ if (firstLaunch) {
   window.eventEmitter.addEventListener("shutdown", function (reason) {
     log("[EXIT]", "Supposed to exit:", reason);
     db.getSettings((settings) => {
-      if (settings == null || !settings.experimentalGameTracking) {
-        log("[EXIT]", reason);
-        overwolf.windows.getCurrentWindow(function (window) {
-          overwolf.windows.close(window.window.id, function () {});
-        });
+      if (settings && settings.experimentalGameTracking) {
+        log(
+          "[EXIT]",
+          "Not exiting, since the user uses experimental game tracking."
+        );
+
+        return;
       }
+
+      exitApp(reason);
     });
   });
 
