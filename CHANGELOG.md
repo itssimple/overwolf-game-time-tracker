@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v0.0.7...v1.1.0) (2021-06-12)
+
+
+### Features
+
+* Add total time tracker ([6f6392e](https://github.com/itssimple/overwolf-game-time-tracker/commit/6f6392e5687f60ab69ef85191a6b83de932777aa))
+* Added generateUUID to give detected sessions a unique sessionId ([bb51090](https://github.com/itssimple/overwolf-game-time-tracker/commit/bb5109085657efad1dfdb52b05b079c8b71c8c2c))
+* Added help-method to pluralize things ([b335728](https://github.com/itssimple/overwolf-game-time-tracker/commit/b335728d9ebb71594e3652be4dd4cf8e599b958e))
+* Added styling for settings and the new thin titlebar ([180c444](https://github.com/itssimple/overwolf-game-time-tracker/commit/180c444f7af02d25362c15e658d30f221202aeeb))
+* Added tray icon/menu support, added more code to load supported OW games. ([b77ad28](https://github.com/itssimple/overwolf-game-time-tracker/commit/b77ad28407562a718915c005e06aa97cc27e3f94))
+* Adding preparing work for the settings page ([9450a29](https://github.com/itssimple/overwolf-game-time-tracker/commit/9450a299b354a0e3d4a2e9f7d22f311bc076aa90))
+* Changed how we call newGameSession (to be able to differentiate from OW-games and possible games) ([0d92c02](https://github.com/itssimple/overwolf-game-time-tracker/commit/0d92c02b4c690431cfe875c36adbb2171f0794ce))
+* Functional settings for game tracking in background (Not shutting down) ([5b5b48d](https://github.com/itssimple/overwolf-game-time-tracker/commit/5b5b48d64ce1b14fc86833cc649feb3847df7197))
+* Tracking other games than Overwolf supports! ([1ba14c2](https://github.com/itssimple/overwolf-game-time-tracker/commit/1ba14c22c2dc51d3a705764f667aa6ca27b16989))
+
+
+### Bug Fixes
+
+* Ability to stop monitoring/logging time if you close the game ([db89af4](https://github.com/itssimple/overwolf-game-time-tracker/commit/db89af4e2f70779bb480b7ac33dee16574ef63f6))
+* Add support for days in the 7 days title counter. ([760eda5](https://github.com/itssimple/overwolf-game-time-tracker/commit/760eda51b3eee30aa2ddd575ca94b75c69878456))
+* Updated GameDetector to handle a few bugfixes ([1b6319d](https://github.com/itssimple/overwolf-game-time-tracker/commit/1b6319d6d115980b7d74f76d93341abcd99c1b59))
+* Updated plugin to have correct GameInfo from API ([4fccb88](https://github.com/itssimple/overwolf-game-time-tracker/commit/4fccb888c5906db16b423b91de50989810ee283d))
+
 ### [0.0.7](https://github.com/itssimple/overwolf-game-time-tracker/compare/v0.0.6...v0.0.7) (2021-05-08)
 
 
