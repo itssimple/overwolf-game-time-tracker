@@ -436,13 +436,34 @@ if (firstLaunch) {
                         processes.InterestingApplications
                       );
                     } else {
-                      if (otherGameProcess) {
+                      if (
+                        otherGameProcess &&
+                        otherGameProcess.sessionId != null
+                      ) {
                         otherGameProcess.isRunning = false;
                         gameInfoUpdated({
                           gameInfo: otherGameProcess,
                           runningChanged: true,
                         });
+
                         otherGameProcess = null;
+                      } else if (
+                        otherGameProcess &&
+                        otherGameProcess.sessionId == null
+                      ) {
+                        getOpenGameSessions(
+                          otherGameProcess.classId,
+                          (session) => {
+                            otherGameProcess.isRunning = false;
+                            otherGameProcess.sessionId = session.sessionId;
+                            gameInfoUpdated({
+                              gameInfo: otherGameProcess,
+                              runningChanged: true,
+                            });
+
+                            otherGameProcess = null;
+                          }
+                        );
                       }
                     }
                   });
