@@ -2,7 +2,7 @@ function GameTimeTrackerDatabase() {
   this.DBInstance = null;
 
   this.initializeDatabase = function (finishedLoadingCallback = null) {
-    let dbRequest = window.indexedDB.open("gameTimeTracker", 3);
+    let dbRequest = window.indexedDB.open("gameTimeTracker", 4);
 
     dbRequest.onupgradeneeded = function (event) {
       const db = dbRequest.result;
@@ -40,6 +40,12 @@ function GameTimeTrackerDatabase() {
 
         gttSettingsStore.createIndex("by_settingsId", "settingsId");
       }
+
+      if (event.oldVersion < 4) {
+        upgradeTransaction
+          .objectStore("gameSessions")
+          .createIndex("by_endedSessions", "sessionEnded");
+      }
     };
 
     dbRequest.onsuccess = function () {
@@ -51,6 +57,7 @@ function GameTimeTrackerDatabase() {
       }
     };
   };
+
   this.newGameSession = function (gameInfo, isGame, isPossibleGame) {
     this.DBInstance.transaction("gameSessions", "readwrite")
       .objectStore("gameSessions")
@@ -62,31 +69,50 @@ function GameTimeTrackerDatabase() {
         endDate: null,
         isGame: isGame,
         isPossibleGame: isPossibleGame,
+        sessionEnded: false,
       });
   };
 
-  this.updateGameSession = function (gameInfo, updateComplete) {
+  this.getGameSessionByClassId = function (classId, resultCallback) {
     this.DBInstance.transaction("gameSessions", "readwrite")
       .objectStore("gameSessions")
       .index("by_gameclass")
-      .openCursor(
-        IDBKeyRange.only(gameInfo.gameInfo.classId),
-        "prev"
-      ).onsuccess = function (event) {
+      .openCursor(IDBKeyRange.only(classId), "prev").onsuccess = function (
+      event
+    ) {
       var cursor = event.target.result;
 
       if (cursor) {
-        if (cursor.value.endDate == null) {
-          const updateSession = cursor.value;
-          updateSession.endDate = Date.now();
-          cursor.update(updateSession);
-
-          if (updateComplete) {
-            updateComplete();
-          }
+        if (cursor.value) {
+          resultCallback(cursor.value);
           return;
         }
         cursor.continue();
+      }
+    };
+  };
+
+  this.getGameSessionByUnendedSessionAndClass = function (
+    classId,
+    resultCallback
+  ) {
+    this.DBInstance.transaction("gameSessions", "readwrite")
+      .objectStore("gameSessions")
+      .openCursor().onsuccess = function (event) {
+      var cursor = event.target.result;
+
+      if (cursor) {
+        if (
+          cursor.value &&
+          !cursor.value.sessionEnded &&
+          cursor.value.gameClass == classId
+        ) {
+          resultCallback(cursor.value);
+          return;
+        }
+        cursor.continue();
+      } else {
+        resultCallback(null);
       }
     };
   };
@@ -129,6 +155,10 @@ function GameTimeTrackerDatabase() {
 
         if (sessionData.isPossibleGame) {
           updateSession.isPossibleGame = sessionData.isPossibleGame;
+        }
+
+        if (sessionData.sessionEnded) {
+          updateSession.sessionEnded = sessionData.sessionEnded;
         }
 
         cursor.update(updateSession);
@@ -222,7 +252,7 @@ function GameTimeTrackerDatabase() {
       var cursor = event.target.result;
 
       if (cursor) {
-        if (!cursor.value.endDate) {
+        if (!cursor.value.endDate || !cursor.value.sessionEnded) {
           rows.push(cursor.value);
         }
 

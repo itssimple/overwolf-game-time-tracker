@@ -100,7 +100,7 @@ function gameInfoUpdated(game) {
   }
 }
 
-window.owSupportedGames = {};
+window.owSupportedGames = [];
 
 function loadOverwolfGameList() {
   log("OVERWOLF", "Finding latest GamesList-file");
@@ -142,6 +142,21 @@ function loadOverwolfGameList() {
                     break;
                 }
 
+                let gameRendererElement =
+                  gameInfo.querySelector("GameRenderers");
+
+                // Potentially gets rid of all launchers and other apps that we don't want to track
+                if (
+                  gameRendererElement &&
+                  gameRendererElement.textContent === "Unknown"
+                ) {
+                  let launchParamElement =
+                    gameInfo.querySelector("LaunchParams");
+                  if (!launchParamElement) {
+                    continue;
+                  }
+                }
+
                 if (ignoreThisGame) {
                   continue;
                 }
@@ -152,29 +167,38 @@ function loadOverwolfGameList() {
                   parseInt(gameInfo.querySelector("ID").textContent, 0) / 10
                 );
 
+                game.classId = gameId;
                 game.gameTitle = gameTitle;
                 game.processNames = [];
                 game.injectionDecision = injectionDecision;
-
-                let launcherNames = gameInfo.querySelectorAll(
-                  "LuancherNames string"
-                );
-                for (let launcher of launcherNames) {
-                  if (!game.processNames.includes(launcher.textContent)) {
-                    game.processNames.push(launcher.textContent);
-                  }
-                }
 
                 let processNames = gameInfo.querySelectorAll(
                   "ProcessNames string"
                 );
                 for (let process of processNames) {
                   if (!game.processNames.includes(process.textContent)) {
-                    game.processNames.push(process.textContent);
+                    game.processNames.push(
+                      process.textContent.substring(
+                        process.textContent.indexOf("*") + 1
+                      )
+                    );
                   }
                 }
 
-                window.owSupportedGames[gameId] = game;
+                /*if (game.processNames.length == 0) {
+                  let launcherNames = gameInfo.querySelectorAll(
+                    "LuancherNames string"
+                  );
+                  for (let launcher of launcherNames) {
+                    if (!game.processNames.includes(launcher.textContent)) {
+                      game.processNames.push(launcher.textContent);
+                    }
+                  }
+                }*/
+
+                if (game.processNames.length > 0) {
+                  window.owSupportedGames[gameId] = game;
+                }
               }
 
               log("OVERWOLF", "Done loading Overwolf games");
@@ -256,7 +280,76 @@ function exitApp(reason) {
   });
 }
 
-function checkInterestingProcesses(processList) {}
+function checkInterestingProcesses(processList) {
+  let foundGame = null;
+  if (processList && processList.length > 0) {
+    for (let process of processList) {
+      if (process.Application) {
+        let owSupport = isOwSupportedGame(process.Application.ProcessPath);
+        if (owSupport && owSupport.injectionDecision !== "Supported") {
+          foundGame = {
+            classId: owSupport.classId,
+            title: owSupport.gameTitle,
+            isGame: true,
+            isPossibleGame: true,
+          };
+        } else if (!owSupport) {
+          let gttGame = isGTTSupportedGame(process.Application.ProcessPath);
+          if (gttGame) {
+            foundGame = {
+              classId: `gtt-${gttGame.Id}`,
+              title: gttGame.DisplayName,
+              isGame: true,
+              isPossibleGame: true,
+            };
+          }
+        }
+      }
+    }
+  }
+
+  if (foundGame && foundGame != null) {
+    getOpenGameSessions(foundGame.classId, (openSession) => {
+      if (!openSession) {
+        // Create new session
+        foundGame.sessionId = generateUUID();
+        gameLaunched(foundGame);
+      } else {
+        // This is an un-ended session with the same classId, let's pretend its the same session
+      }
+    });
+  }
+}
+
+function isOwSupportedGame(path) {
+  let executable = path.substr(path.lastIndexOf("\\") + 1);
+  return owSupportedGames
+    .flatMap((item) => item)
+    .find((item) => {
+      for (let process of item.processNames) {
+        if (process.indexOf(executable) > -1) {
+          return true;
+        }
+      }
+      return false;
+    });
+}
+
+function isGTTSupportedGame(path) {
+  let executable = path.substr(path.lastIndexOf("\\") + 1);
+  return gameDetector.GameInfo.map((item) => item).find((item) => {
+    for (let proc of item.ProcessNames) {
+      if (executable.indexOf(proc) > -1) {
+        return true;
+      }
+      return false;
+    }
+  });
+}
+
+function getOpenGameSessions(classId, resultCallback) {
+  db.getGameSessionByUnendedSessionAndClass(classId, resultCallback);
+}
 
 if (firstLaunch) {
   log(
@@ -286,7 +379,10 @@ if (firstLaunch) {
               log("SESSION:CLEANUP", "Unfinished session", session);
 
               // Lets just set it as one minute extra from start right now.
-              session.endDate = session.startDate + 60000;
+              if (!session.endDate) {
+                session.endDate = session.startDate + 60000;
+              }
+              session.sessionEnded = true;
               window.db.updateGameSessionBySessionId(
                 session.sessionId,
                 session,
@@ -346,7 +442,6 @@ if (firstLaunch) {
       });
 
       log("DATABASE", "Done initializing the database");
-
       log("INIT:LAUNCHREASON", location.search);
 
       if (
@@ -438,11 +533,21 @@ if (firstLaunch) {
   });
 
   window.eventEmitter.addEventListener("game-launched", function (gameInfo) {
-    db.newGameSession(gameInfo, true, true);
+    getOpenGameSessions(gameInfo.classId, function (ongoingSession) {
+      if (ongoingSession) {
+        // Session ongoing, keep updating that one
+      } else {
+        // No previous session, create new session
+        db.newGameSession(gameInfo, true, true);
+      }
+    });
   });
 
   window.eventEmitter.addEventListener("game-exited", function (gameInfo) {
-    db.updateGameSession(gameInfo);
+    window.db.updateGameSessionBySessionId(gameInfo.gameInfo.sessionId, {
+      endDate: Date.now(),
+      sessionEnded: true,
+    });
 
     if (!mainWindowId) {
       window.eventEmitter.emit(

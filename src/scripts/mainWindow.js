@@ -18,14 +18,24 @@ var activeGameTicker = null;
 var overwolfAdvertiseObject = null;
 var overwolfAdvertiseInitialized = false;
 
-eventEmitter.addEventListener("game-launched", function () {
+eventEmitter.addEventListener("game-launched", function (game) {
   activeGameTicker = setInterval(loadLatestSessions, 5000);
   loadLatestSessions();
+  document.querySelector(".currentlyPlaying").textContent =
+    "Currently playing: " + game.title;
 });
+
+var windowReload = null;
 
 eventEmitter.addEventListener("refresh-window", function (window) {
   if (window == "mainWindow") {
-    loadLatestSessions();
+    if (windowReload != null) {
+      clearTimeout(windowReload);
+    }
+    windowReload = setTimeout(function () {
+      loadLatestSessions();
+      windowReload = null;
+    }, 100);
   }
 });
 
@@ -35,6 +45,9 @@ eventEmitter.addEventListener("game-exited", function () {
     activeGameTicker = null;
     loadLatestSessions();
   }
+
+  document.querySelector(".currentlyPlaying").textContent =
+    "Currently playing: Nothing";
 });
 
 function loadLatestSessions() {
