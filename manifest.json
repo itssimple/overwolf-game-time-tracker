@@ -6,7 +6,7 @@
     "description": "This application enables you to track how much time you spend in your games. Features pretty graphs and tasty stats!",
     "version": "0.0.7",
     "author": "NoLifeKing85",
-    "minimum-overwolf-version": "0.159.0",
+    "minimum-overwolf-version": "0.173.0",
     "icon": "resources/images/logo.png",
     "icon_gray": "resources/images/logo_bw.png",
     "window_icon": "resources/images/logo.png",
