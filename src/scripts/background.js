@@ -503,7 +503,7 @@ if (firstLaunch) {
       } else {
         overwolf.extensions.current.getManifest((manifest) => {
           if (manifest.has_devtools) {
-            openWindow(null, location.search);
+            //openWindow(null, location.search);
           }
         });
       }
