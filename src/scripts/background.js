@@ -272,7 +272,7 @@ function onLauncherTerminated(result) {
 }
 
 function exitApp(reason) {
-  overwolf.os.tray.destroy();
+  //overwolf.os.tray.destroy();
 
   log("EXIT", reason);
   overwolf.windows.getCurrentWindow(function (window) {
@@ -566,7 +566,9 @@ if (firstLaunch) {
   });
 
   window.eventEmitter.addEventListener("game-launched", function (gameInfo) {
+    log("EVENT:GAME-LAUNCHED", gameInfo);
     getOpenGameSessions(gameInfo.classId, function (ongoingSession) {
+      log("EVENT:GAME-LAUNCHED", ongoingSession);
       if (ongoingSession) {
         // Session ongoing, keep updating that one
       } else {
@@ -577,6 +579,7 @@ if (firstLaunch) {
   });
 
   window.eventEmitter.addEventListener("game-exited", function (gameInfo) {
+    log("EVENT:GAME-EXITED", gameInfo);
     window.db.updateGameSessionBySessionId(gameInfo.gameInfo.sessionId, {
       endDate: Date.now(),
       sessionEnded: true,
