@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.1.3...v1.2.0) (2021-06-22)
+
+
+### Features
+
+* Track more (not yet fully supported) games, and send game suggestion data in the background for getting support for them. ([ef22016](https://github.com/itssimple/overwolf-game-time-tracker/commit/ef220164f58847fe97e13c0d935297077e773611))
+
 ### [1.1.3](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.1.2...v1.1.3) (2021-06-15)
 
 
