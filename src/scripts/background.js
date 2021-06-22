@@ -294,7 +294,10 @@ function toggleExperimentalGameDetection() {
       gameDetectorGameSessionDetector = setInterval(function () {
         gameDetector.CheckProcesses((processes) => {
           if (processes && processes.InterestingApplications.length > 0) {
-            checkInterestingProcesses(processes.InterestingApplications);
+            checkInterestingProcesses(
+              processes.InterestingApplications,
+              settings.sendPossibleGameData
+            );
           } else {
             if (otherGameProcess && otherGameProcess.sessionId != null) {
               otherGameProcess.isRunning = false;
@@ -327,10 +330,23 @@ function toggleExperimentalGameDetection() {
 
 let sentSuggestionsThisSession = [];
 
-function checkInterestingProcesses(processList) {
+function checkInterestingProcesses(processList, sendPossibleGameData) {
   if (processList && processList.length > 0) {
     for (let process of processList) {
       if (process.Application) {
+        let gttGame = isGTTSupportedGame(process.Application.ProcessPath);
+        if (gttGame) {
+          otherGameProcess = {
+            classId: `gtt-${gttGame.Id}`,
+            title: gttGame.DisplayName,
+            isGame: true,
+            isPossibleGame: true,
+            sessionId: null,
+          };
+
+          break;
+        }
+
         let owSupport = isOwSupportedGame(process.Application.ProcessPath);
         if (owSupport && owSupport.injectionDecision !== "Supported") {
           otherGameProcess = {
@@ -342,20 +358,9 @@ function checkInterestingProcesses(processList) {
           };
 
           break;
-        } else if (!owSupport) {
-          let gttGame = isGTTSupportedGame(process.Application.ProcessPath);
-          if (gttGame) {
-            otherGameProcess = {
-              classId: `gtt-${gttGame.Id}`,
-              title: gttGame.DisplayName,
-              isGame: true,
-              isPossibleGame: true,
-              sessionId: null,
-            };
+        }
 
-            break;
-          }
-
+        if (sendPossibleGameData) {
           if (processList.length == 1) {
             // Since we only have interesting applications in here, it shouldn't be an issue to use them as games
             let executable = process.Application.ProcessPath.substr(
@@ -388,6 +393,7 @@ function checkInterestingProcesses(processList) {
                 process.Application.ProcessPath
               );
               sentSuggestionsThisSession.push(otherGameProcess.classId);
+              break;
             }
           } else {
             // In case we have multiple entries from the interesting application array
@@ -411,13 +417,20 @@ function checkInterestingProcesses(processList) {
   }
 }
 
+const ignoredOWProcesses = ["game.exe", "nw.exe"];
+
 function isOwSupportedGame(path) {
   let executable = path.substr(path.lastIndexOf("\\") + 1);
+
+  if (ignoredOWProcesses.includes(executable.toLowerCase())) {
+    return false;
+  }
+
   return owSupportedGames
     .flatMap((item) => item)
     .find((item) => {
       for (let process of item.processNames) {
-        if (process.indexOf(executable) > -1) {
+        if (process.indexOf(executable) === 0) {
           return true;
         }
       }
@@ -429,7 +442,7 @@ function isGTTSupportedGame(path) {
   let executable = path.substr(path.lastIndexOf("\\") + 1);
   return gameDetector.GameInfo.map((item) => item).find((item) => {
     for (let proc of item.ProcessNames) {
-      if (executable.indexOf(proc) > -1) {
+      if (executable.indexOf(proc) === 0) {
         return true;
       }
       return false;
