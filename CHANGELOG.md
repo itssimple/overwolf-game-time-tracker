@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.1](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.2.0...v1.2.1) (2021-06-22)
+
+
+### Bug Fixes
+
+* Changed order of checking game detection. ([6839928](https://github.com/itssimple/overwolf-game-time-tracker/commit/683992898e96770ad98ce10778580cc00c5a7a66))
+
 ## [1.2.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.1.3...v1.2.0) (2021-06-22)
 
 
