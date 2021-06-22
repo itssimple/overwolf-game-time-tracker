@@ -208,6 +208,11 @@ function GameTimeTrackerDatabase() {
             settingsObject.experimentalGameTracking;
         }
 
+        if (settingsObject.sendPossibleGameData !== undefined) {
+          updateSession.sendPossibleGameData =
+            settingsObject.sendPossibleGameData;
+        }
+
         cursor.update(updateSession);
       }
     };

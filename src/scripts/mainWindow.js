@@ -318,6 +318,12 @@ function loadSettings() {
       if (_settings.experimentalGameTracking) {
         document.getElementById("settingsExperimentalTracking").checked = true;
       }
+
+      if (_settings.sendPossibleGameData) {
+        document.getElementById(
+          "settingsAutomaticSendPossibleGame"
+        ).checked = true;
+      }
     }
   });
 }
@@ -357,7 +363,23 @@ function loadSettings() {
           {
             experimentalGameTracking: experimentalEnabled,
           },
-          console.log
+          function () {
+            eventEmitter.emit("settings-changed");
+          }
+        );
+      });
+
+    document
+      .getElementById("settingsAutomaticSendPossibleGame")
+      .addEventListener("change", function (event) {
+        let sendPossibleGame = event.target.checked;
+        db.setSettings(
+          {
+            sendPossibleGameData: sendPossibleGame,
+          },
+          function () {
+            eventEmitter.emit("settings-changed");
+          }
         );
       });
   });

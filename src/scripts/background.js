@@ -282,6 +282,51 @@ function exitApp(reason) {
 
 var otherGameProcess = null;
 
+function toggleExperimentalGameDetection() {
+  db.getSettings((settings) => {
+    clearInterval(gameDetectorGameInfoUpdater);
+    if (settings && settings.experimentalGameTracking) {
+      log("GAMEDETECTOR", "Enabling background updates");
+      gameDetectorGameInfoUpdater = setInterval(function () {
+        gameDetector.LoadGameDBData();
+      }, 600000);
+
+      gameDetectorGameSessionDetector = setInterval(function () {
+        gameDetector.CheckProcesses((processes) => {
+          if (processes && processes.InterestingApplications.length > 0) {
+            checkInterestingProcesses(processes.InterestingApplications);
+          } else {
+            if (otherGameProcess && otherGameProcess.sessionId != null) {
+              otherGameProcess.isRunning = false;
+              gameInfoUpdated({
+                gameInfo: otherGameProcess,
+                runningChanged: true,
+              });
+
+              otherGameProcess = null;
+            } else if (otherGameProcess && otherGameProcess.sessionId == null) {
+              getOpenGameSessions(otherGameProcess.classId, (session) => {
+                otherGameProcess.isRunning = false;
+                otherGameProcess.sessionId = session.sessionId;
+                gameInfoUpdated({
+                  gameInfo: otherGameProcess,
+                  runningChanged: true,
+                });
+
+                otherGameProcess = null;
+              });
+            }
+          }
+        });
+      }, 10000);
+    } else {
+      log("GAMEDETECTOR", "Disabling background updates");
+    }
+  });
+}
+
+let sentSuggestionsThisSession = [];
+
 function checkInterestingProcesses(processList) {
   if (processList && processList.length > 0) {
     for (let process of processList) {
@@ -295,6 +340,8 @@ function checkInterestingProcesses(processList) {
             isPossibleGame: true,
             sessionId: null,
           };
+
+          break;
         } else if (!owSupport) {
           let gttGame = isGTTSupportedGame(process.Application.ProcessPath);
           if (gttGame) {
@@ -305,6 +352,45 @@ function checkInterestingProcesses(processList) {
               isPossibleGame: true,
               sessionId: null,
             };
+
+            break;
+          }
+
+          if (processList.length == 1) {
+            // Since we only have interesting applications in here, it shouldn't be an issue to use them as games
+            let executable = process.Application.ProcessPath.substr(
+              process.Application.ProcessPath.lastIndexOf("\\") + 1
+            );
+
+            otherGameProcess = {
+              classId: `gtt-unknown-${executable}`,
+              title: process.Application.WindowTitle,
+              isGame: false,
+              isPossibleGame: true,
+              sessionId: null,
+            };
+
+            if (
+              !sentSuggestionsThisSession.includes(otherGameProcess.classId)
+            ) {
+              log(
+                "GAME-SUGGESTION",
+                "Sending game data to backend database",
+                process,
+                executable,
+                otherGameProcess
+              );
+
+              gameDetector.SendGameSuggestion(
+                process.Application.WindowTitle,
+                executable,
+                process.Application.ProcessClassName,
+                process.Application.ProcessPath
+              );
+              sentSuggestionsThisSession.push(otherGameProcess.classId);
+            }
+          } else {
+            // In case we have multiple entries from the interesting application array
           }
         }
       }
@@ -417,59 +503,7 @@ if (firstLaunch) {
 
           gameDetector.LoadGameDBData(function (data) {
             log("GAMEDETECTOR", "Loaded data from server", data);
-
-            db.getSettings((settings) => {
-              clearInterval(gameDetectorGameInfoUpdater);
-              if (settings && settings.experimentalGameTracking) {
-                log("GAMEDETECTOR", "Enabling background updates");
-                gameDetectorGameInfoUpdater = setInterval(function () {
-                  gameDetector.LoadGameDBData();
-                }, 30000);
-
-                gameDetectorGameSessionDetector = setInterval(function () {
-                  gameDetector.CheckProcesses((processes) => {
-                    if (
-                      processes &&
-                      processes.InterestingApplications.length > 0
-                    ) {
-                      checkInterestingProcesses(
-                        processes.InterestingApplications
-                      );
-                    } else {
-                      if (
-                        otherGameProcess &&
-                        otherGameProcess.sessionId != null
-                      ) {
-                        otherGameProcess.isRunning = false;
-                        gameInfoUpdated({
-                          gameInfo: otherGameProcess,
-                          runningChanged: true,
-                        });
-
-                        otherGameProcess = null;
-                      } else if (
-                        otherGameProcess &&
-                        otherGameProcess.sessionId == null
-                      ) {
-                        getOpenGameSessions(
-                          otherGameProcess.classId,
-                          (session) => {
-                            otherGameProcess.isRunning = false;
-                            otherGameProcess.sessionId = session.sessionId;
-                            gameInfoUpdated({
-                              gameInfo: otherGameProcess,
-                              runningChanged: true,
-                            });
-
-                            otherGameProcess = null;
-                          }
-                        );
-                      }
-                    }
-                  });
-                }, 10000);
-              }
-            });
+            toggleExperimentalGameDetection();
           });
         }
       });
@@ -606,6 +640,10 @@ if (firstLaunch) {
     });
   });
 
+  window.eventEmitter.addEventListener("settings-changed", function () {
+    toggleExperimentalGameDetection();
+  });
+
   window.eventEmitter.addEventListener("shutdown", function (reason) {
     log("EXIT", "Supposed to exit:", reason);
     db.getSettings((settings) => {
@@ -620,6 +658,17 @@ if (firstLaunch) {
 
       exitApp(reason);
     });
+  });
+
+  /*overwolf.settings.hotkeys.assign("show_appMainWindow", function (e) {
+    console.log(e);
+  });
+  overwolf.settings.hotkeys.assign("send_gameSuggestion", function (e) {
+    console.log(e);
+  });*/
+
+  overwolf.settings.hotkeys.onPressed.addListener(function (e) {
+    console.log(e);
   });
 
   log("INIT", "All eventhandlers have been set");
