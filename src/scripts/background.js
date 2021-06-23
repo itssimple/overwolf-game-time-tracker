@@ -67,6 +67,8 @@ var backgroundGameUpdater = null;
 var gameDetectorGameInfoUpdater = null;
 var gameDetectorGameSessionDetector = null;
 
+var appUpdateCheck = null;
+
 function gameLaunched(game) {
   if (game) {
     if (window.possibleGameName && window.possibleGameName != null) {
@@ -524,6 +526,8 @@ if (firstLaunch) {
       log("DATABASE", "Done initializing the database");
       log("INIT:LAUNCHREASON", location.search);
 
+      let wasPreviouslyOpened = localStorage.getItem("mainWindow_opened");
+
       if (
         location.search.indexOf("-from-desktop") > -1 ||
         location.search.indexOf("source=commandline") > -1 ||
@@ -531,8 +535,10 @@ if (firstLaunch) {
         location.search.indexOf("source=storeapi") > -1 ||
         location.search.indexOf("source=odk") > -1 ||
         location.search.indexOf("source=after-install") > -1 ||
-        location.search.indexOf("source=tray") > -1
+        location.search.indexOf("source=tray") > -1 ||
+        (wasPreviouslyOpened != null && wasPreviouslyOpened == "true")
       ) {
+        localStorage.removeItem("mainWindow_opened");
         openWindow(null, location.search);
       } else if (location.search.indexOf("source=gamelaunchevent") > -1) {
         log("GAME:LAUNCH", "Application was started by game");
@@ -657,6 +663,74 @@ if (firstLaunch) {
     toggleExperimentalGameDetection();
   });
 
+  window.eventEmitter.addEventListener("download-update", function () {
+    overwolf.extensions.updateExtension(handleUpdateMessages);
+  });
+
+  function handleUpdateMessages(updateExtensionResult) {
+    if (updateExtensionResult.success) {
+      // This is what happens when the update was successful
+      checkExtensionUpdate();
+    } else {
+      // Oh no, we failed to update, lets check why
+
+      overwolf.windows.getWindowState(mainWindowId, function (state) {
+        if (
+          state.success &&
+          state.window_state_ex != "closed" &&
+          state.window_state_ex != "hidden"
+        ) {
+          window.eventEmitter.emit("main-window-notification", {
+            class: "error",
+            message: updateExtensionResult.info,
+          });
+        }
+      });
+    }
+  }
+
+  window.eventEmitter.addEventListener("relaunch-check", function () {
+    window.db.getUnfinishedSessions(function (unfinishedSessions) {
+      if (unfinishedSessions && unfinishedSessions.length > 0) {
+        // Warn the user that they are currently in a session, but give them the ability to relaunch anyway
+        window.eventEmitter.emit("main-window-notification", {
+          class: "warn",
+          message: `Are you sure you want to relaunch the application right now?<br />
+You currently have ${pluralize(
+            unfinishedSessions.length,
+            "session",
+            "sessions"
+          )} open.`,
+        });
+      } else {
+        overwolf.windows.getWindowState(mainWindowId, function (state) {
+          localStorage.setItem(
+            "mainWindow_opened",
+            state.success &&
+              state.window_state_ex != "closed" &&
+              state.window_state_ex != "hidden"
+          );
+          overwolf.extensions.relaunch();
+        });
+      }
+    });
+  });
+
+  window.eventEmitter.addEventListener("update-available", function (version) {
+    log("UPDATE-CHECK", "New version available of the app", version);
+  });
+
+  window.eventEmitter.addEventListener(
+    "update-pending-restart",
+    function (version) {
+      log(
+        "UPDATE-CHECK",
+        "Waiting for user to restart app so we can apply the new version",
+        version
+      );
+    }
+  );
+
   window.eventEmitter.addEventListener("shutdown", function (reason) {
     log("EXIT", "Supposed to exit:", reason);
     db.getSettings((settings) => {
@@ -673,16 +747,48 @@ if (firstLaunch) {
     });
   });
 
-  /*overwolf.settings.hotkeys.assign("show_appMainWindow", function (e) {
-    console.log(e);
-  });
-  overwolf.settings.hotkeys.assign("send_gameSuggestion", function (e) {
-    console.log(e);
-  });*/
+  function checkExtensionUpdate() {
+    overwolf.extensions.checkForExtensionUpdate((updateState) => {
+      if (updateState.success) {
+        switch (updateState.state) {
+          case "UpdateAvailable": // An update to the app is available
+            log(
+              "UPDATE-CHECK",
+              "New version available!",
+              updateState.updateVersion
+            );
 
-  overwolf.settings.hotkeys.onPressed.addListener(function (e) {
-    console.log(e);
-  });
+            window.eventEmitter.emit(
+              "update-available",
+              updateState.updateVersion
+            );
+            break;
+          case "PendingRestart": // We have updated the app in the background and now just wait until we can relaunch the app
+            log(
+              "UPDATE-CHECK",
+              "Waiting for moment to restart app to get new update",
+              updateState.updateVersion
+            );
+
+            window.eventEmitter.emit(
+              "update-pending-restart",
+              updateState.updateVersion
+            );
+            break;
+          case "UpToDate": // Do nothing, the app is up to date
+            break;
+          default:
+            // Never gonna go here, but for safekeeping
+            log("UPDATE-CHECK", "Unknown state", updateState);
+            break;
+        }
+      }
+    });
+  }
+
+  setInterval(function () {
+    checkExtensionUpdate();
+  }, 3600000); // Once every hour
 
   log("INIT", "All eventhandlers have been set");
 }

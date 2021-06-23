@@ -336,6 +336,53 @@ function loadSettings() {
   });
 }
 
+function downloadUpdate() {
+  log("UPDATE", "User clicked the 'Update available!' text");
+  eventEmitter.emit("download-update");
+}
+
+function relaunchTheApp() {
+  log(
+    "UPDATE",
+    "User clicked the 'Pending restart!' text, relaunching the app to install new version"
+  );
+  eventEmitter.emit("relaunch-check");
+}
+
+var windowTitle = "Game Time Tracker";
+
+eventEmitter.addEventListener("update-available", function (version) {
+  document.getElementById(
+    "titleBarName"
+  ).innerHTML = `${windowTitle} - <span class="update-available" onclick="downloadUpdate(); return false;" title="An update (${version}) is available for this application, click here to update to the new version">Update available!</span>`;
+});
+
+eventEmitter.addEventListener("update-pending-restart", function (version) {
+  document.getElementById(
+    "titleBarName"
+  ).innerHTML = `${windowTitle} - <span class="update-pending-restart" onclick="relaunchTheApp(); return false;" title="We need to restart the application to apply the new version, click here to restart">Pending restart!</span>`;
+});
+
+eventEmitter.addEventListener(
+  "main-window-notification",
+  function (messageObject) {
+    // messageObject { class: string (info, warn, error), message: string }
+    // TODO: Add notification message function
+  }
+);
+
+function loadChangelog() {
+  let xml = new XMLHttpRequest();
+  xml.open("GET", "../CHANGELOG.md", true);
+
+  xml.onload = function () {
+    const changelogBlock = document.querySelector("#changelog-cardbody");
+    changelogBlock.innerHTML = window.markdownit().render(this.responseText);
+  };
+
+  xml.send(null);
+}
+
 (function () {
   loadSettings();
   loadLatestSessions();
@@ -358,9 +405,8 @@ function loadSettings() {
       });
 
     overwolf.extensions.current.getManifest(function (app) {
-      document.getElementById(
-        "titleBarName"
-      ).innerHTML = `Game Time Tracker - v${app.meta.version}`;
+      windowTitle = `Game Time Tracker - v${app.meta.version}`;
+      document.getElementById("titleBarName").innerHTML = windowTitle;
     });
 
     document
@@ -390,5 +436,7 @@ function loadSettings() {
           }
         );
       });
+
+    loadChangelog();
   });
 })();
