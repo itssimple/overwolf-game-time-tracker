@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.2.1...v1.3.0) (2021-06-23)
+
+
+### Features
+
+* Added tooltip for graph. (requested by Soode) ([cf65738](https://github.com/itssimple/overwolf-game-time-tracker/commit/cf657382389d0a9f28ca082f16eb49306c6d6920))
+* Updatecheck + changelog-tab ([990c34d](https://github.com/itssimple/overwolf-game-time-tracker/commit/990c34d14078fdc9046655b6a8b971ecfdfbefd7))
+
 ### [1.2.1](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.2.0...v1.2.1) (2021-06-22)
 
 
