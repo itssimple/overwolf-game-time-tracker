@@ -28,14 +28,14 @@
     "start_window": "background",
     "windows": {
       "background": {
-        "file": "windows/background-window.html",
+        "file": "resources/compiled/windows/background-window.html",
         "show_in_taskbar": false,
         "is_background_page": true,
         "background_optimization": false,
         "block_top_window_navigation": true
       },
       "mainWindow": {
-        "file": "windows/main-window.html",
+        "file": "resources/compiled/windows/main-window.html",
         "show_in_taskbar": true,
         "is_background_page": false,
         "block_top_window_navigation": true,

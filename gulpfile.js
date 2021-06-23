@@ -6,12 +6,22 @@ const purgecss = require("gulp-purgecss");
 const pinfo = require("./package.json");
 const exec = require("child_process").exec;
 var uglify = require("gulp-uglify");
+const fs = require("fs");
+const md = require("markdown-it")();
 
 gulp.task("fix-version", function () {
   return gulp
     .src("src/manifest.json")
     .pipe(replace("$VERSION$", pinfo.version))
     .pipe(gulp.dest("./"));
+});
+
+gulp.task("fix-windows", function () {
+  var changeLog = fs.readFileSync("CHANGELOG.md", "utf8");
+  return gulp
+    .src("src/windows/**/*.html")
+    .pipe(replace("$CHANGELOG$", md.render(changeLog)))
+    .pipe(gulp.dest("resources/compiled/windows/"));
 });
 
 gulp.task("styles-nano", function () {
@@ -27,7 +37,7 @@ gulp.task("purge-unused-css", function () {
     .src("src/scss/bootstrap.min.css")
     .pipe(
       purgecss({
-        content: ["windows/**/*.html", "src/scripts/**/*.js"],
+        content: ["src/windows/**/*.html", "src/scripts/**/*.js"],
       })
     )
     .pipe(gulp.dest("resources/compiled/css/"));
@@ -55,25 +65,34 @@ gulp.task("default", function () {
     "src/scss/**/*.scss",
     gulp.series(
       "styles-nano",
+      "fix-windows",
       "purge-unused-css",
       "fix-version",
       "build-archive"
     )
   );
-  gulp.watch("src/manifest.json", gulp.series("fix-version", "build-archive"));
   gulp.watch(
-    "windows/*.*",
+    "src/manifest.json",
+    gulp.series("fix-version", "fix-windows", "build-archive")
+  );
+  gulp.watch(
+    "src/windows/*.*",
     gulp.series(
       "styles-nano",
+      "fix-windows",
       "purge-unused-css",
       "fix-version",
       "build-archive"
     )
   );
-  gulp.watch("package.json", gulp.series("fix-version", "build-archive"));
+  gulp.watch(
+    "package.json",
+    gulp.series("fix-version", "fix-windows", "build-archive")
+  );
+  gulp.watch("CHANGELOG.md", gulp.series("fix-windows"));
   gulp.watch(
     "src/scripts/**/*.js",
-    gulp.series("minify-scripts", "build-archive")
+    gulp.series("minify-scripts", "fix-windows", "build-archive")
   );
 });
 
@@ -84,6 +103,7 @@ gulp.task(
     "styles-nano",
     "purge-unused-css",
     "fix-version",
+    "fix-windows",
     "build-archive"
   )
 );

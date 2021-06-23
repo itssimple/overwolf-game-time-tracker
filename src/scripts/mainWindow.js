@@ -371,18 +371,6 @@ eventEmitter.addEventListener(
   }
 );
 
-function loadChangelog() {
-  let xml = new XMLHttpRequest();
-  xml.open("GET", "../CHANGELOG.md", true);
-
-  xml.onload = function () {
-    const changelogBlock = document.querySelector("#changelog-cardbody");
-    changelogBlock.innerHTML = window.markdownit().render(this.responseText);
-  };
-
-  xml.send(null);
-}
-
 (function () {
   loadSettings();
   loadLatestSessions();
@@ -436,7 +424,5 @@ function loadChangelog() {
           }
         );
       });
-
-    loadChangelog();
   });
 })();

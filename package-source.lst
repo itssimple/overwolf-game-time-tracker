@@ -1,5 +1,4 @@
 resources\*
-windows\*
 plugin\*
 .\manifest.json
 .\CHANGELOG.md
