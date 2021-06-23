@@ -98,3 +98,13 @@ body {
 .custom-control-input:checked ~ .custom-control-label::before {
   background-color: #000;
 }
+
+.chartist-tooltip {
+  background: #272b30;
+  border: 1px solid #515960;
+  color: #fff;
+}
+
+.chartist-tooltip:before {
+  border-top-color: #272b30;
+}

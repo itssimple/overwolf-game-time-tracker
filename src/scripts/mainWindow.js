@@ -295,6 +295,14 @@ function renderGraph(data) {
         },
       },
       height: 149,
+      plugins: [
+        Chartist.plugins.tooltip({
+          anchorToPoint: false,
+          transformTooltipTextFnc: (value) => {
+            return outputTimesObjectFromDifference(value * 3600);
+          },
+        }),
+      ],
     });
   }, 200);
 }
