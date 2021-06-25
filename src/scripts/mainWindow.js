@@ -424,5 +424,19 @@ eventEmitter.addEventListener(
           }
         );
       });
+
+    document.getElementById("send-logs").addEventListener("click", function () {
+      let logButton = document.getElementById("send-logs");
+      logButton.innerText = "Uploading logs, please wait ...";
+      logButton.disabled = true;
+      overwolf.utils.uploadClientLogs(function () {
+        // TODO: Show a message that the logs were uploaded
+        logButton.innerText = "Logs sent, thank you";
+        setTimeout(function () {
+          logButton.innerText = "Send logs to the developer";
+          logButton.disabled = false;
+        }, 5000);
+      });
+    });
   });
 })();
