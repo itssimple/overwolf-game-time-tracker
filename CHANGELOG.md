@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.3.0...v1.4.0) (2021-06-25)
+
+
+### Features
+
+* Added button to send logs, changed twitter link ([3d85f25](https://github.com/itssimple/overwolf-game-time-tracker/commit/3d85f2578f2c29889d23dfa4e82da8ba5c6315a7))
+
 ## [1.3.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.2.1...v1.3.0) (2021-06-23)
 
 
