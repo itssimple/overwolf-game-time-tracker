@@ -362,7 +362,7 @@ function checkInterestingProcesses(processList, sendPossibleGameData) {
           break;
         }
 
-        if (sendPossibleGameData) {
+        if (!owSupport && sendPossibleGameData) {
           if (processList.length == 1) {
             // Since we only have interesting applications in here, it shouldn't be an issue to use them as games
             let executable = process.Application.ProcessPath.substr(
