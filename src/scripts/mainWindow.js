@@ -47,7 +47,7 @@ eventEmitter.addEventListener("game-exited", function () {
   }
 
   document.querySelector(".currentlyPlaying").textContent =
-    "Currently playing: Nothing";
+    "Currently playing: Nothing at all!";
 });
 
 function loadLatestSessions() {
@@ -380,6 +380,7 @@ eventEmitter.addEventListener(
     document
       .getElementById("exitButton")
       .addEventListener("click", function () {
+        localStorage.removeItem("mainWindow_opened");
         overwolf.games.getRunningGameInfo(function (data) {
           if (!data) {
             eventEmitter.emit(
@@ -439,4 +440,6 @@ eventEmitter.addEventListener(
       });
     });
   });
+
+  localStorage.setItem("mainWindow_opened", true);
 })();
