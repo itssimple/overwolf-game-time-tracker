@@ -13,7 +13,11 @@ function openWindow(event, originEvent) {
     log("WINDOW", "Got launch event: ", event);
   }
 
-  if (event && event.origin == "overwolfstartlaunchevent") {
+  if (
+    event &&
+    (event.origin == "overwolfstartlaunchevent" ||
+      event.origin == "gamelaunchevent")
+  ) {
     return;
   }
   overwolf.windows.obtainDeclaredWindow("mainWindow", (result) => {
@@ -35,6 +39,10 @@ const trayMenu = {
     },
     {
       label: "-",
+    },
+    {
+      label: "Relaunch",
+      id: "relaunch_gtt",
     },
     {
       label: "Exit",
@@ -282,8 +290,6 @@ function exitApp(reason) {
   });
 }
 
-var otherGameProcess = null;
-
 function toggleExperimentalGameDetection() {
   db.getSettings((settings) => {
     clearInterval(gameDetectorGameInfoUpdater);
@@ -295,32 +301,11 @@ function toggleExperimentalGameDetection() {
 
       gameDetectorGameSessionDetector = setInterval(function () {
         gameDetector.CheckProcesses((processes) => {
-          if (processes && processes.InterestingApplications.length > 0) {
+          if (processes) {
             checkInterestingProcesses(
               processes.InterestingApplications,
               settings.sendPossibleGameData
             );
-          } else {
-            if (otherGameProcess && otherGameProcess.sessionId != null) {
-              otherGameProcess.isRunning = false;
-              gameInfoUpdated({
-                gameInfo: otherGameProcess,
-                runningChanged: true,
-              });
-
-              otherGameProcess = null;
-            } else if (otherGameProcess && otherGameProcess.sessionId == null) {
-              getOpenGameSessions(otherGameProcess.classId, (session) => {
-                otherGameProcess.isRunning = false;
-                otherGameProcess.sessionId = session.sessionId;
-                gameInfoUpdated({
-                  gameInfo: otherGameProcess,
-                  runningChanged: true,
-                });
-
-                otherGameProcess = null;
-              });
-            }
           }
         });
       }, 10000);
@@ -331,8 +316,12 @@ function toggleExperimentalGameDetection() {
 }
 
 let sentSuggestionsThisSession = [];
+var otherGameProcesses = [];
 
 function checkInterestingProcesses(processList, sendPossibleGameData) {
+  let previousProcesses = [...otherGameProcesses];
+
+  let newProcesses = [];
   if (processList && processList.length > 0) {
     for (let process of processList) {
       if (process.Application) {
@@ -346,7 +335,8 @@ function checkInterestingProcesses(processList, sendPossibleGameData) {
             sessionId: null,
           };
 
-          break;
+          newProcesses.push(otherGameProcess);
+          continue;
         }
 
         let owSupport = isOwSupportedGame(process.Application.ProcessPath);
@@ -359,11 +349,12 @@ function checkInterestingProcesses(processList, sendPossibleGameData) {
             sessionId: null,
           };
 
-          break;
+          newProcesses.push(otherGameProcess);
+          continue;
         }
 
-        if (!owSupport && sendPossibleGameData) {
-          if (processList.length == 1) {
+        if (!owSupport) {
+          if (sendPossibleGameData) {
             // Since we only have interesting applications in here, it shouldn't be an issue to use them as games
             let executable = process.Application.ProcessPath.substr(
               process.Application.ProcessPath.lastIndexOf("\\") + 1
@@ -376,6 +367,8 @@ function checkInterestingProcesses(processList, sendPossibleGameData) {
               isPossibleGame: true,
               sessionId: null,
             };
+
+            newProcesses.push(otherGameProcess);
 
             if (
               !sentSuggestionsThisSession.includes(otherGameProcess.classId)
@@ -395,17 +388,19 @@ function checkInterestingProcesses(processList, sendPossibleGameData) {
                 process.Application.ProcessPath
               );
               sentSuggestionsThisSession.push(otherGameProcess.classId);
-              break;
+
+              continue;
             }
-          } else {
-            // In case we have multiple entries from the interesting application array
           }
         }
       }
     }
   }
 
-  if (otherGameProcess && otherGameProcess != null) {
+  for (let otherGameProcess of newProcesses) {
+    previousProcesses = previousProcesses.filter(
+      (item) => item.classId != otherGameProcess.classId
+    );
     getOpenGameSessions(otherGameProcess.classId, (openSession) => {
       if (!openSession) {
         // Create new session
@@ -417,6 +412,27 @@ function checkInterestingProcesses(processList, sendPossibleGameData) {
       }
     });
   }
+
+  for (let oldProcess of previousProcesses) {
+    if (oldProcess && oldProcess.sessionId != null) {
+      oldProcess.isRunning = false;
+      gameInfoUpdated({
+        gameInfo: oldProcess,
+        runningChanged: true,
+      });
+    } else if (oldProcess && oldProcess.sessionId == null) {
+      getOpenGameSessions(oldProcess.classId, (session) => {
+        oldProcess.isRunning = false;
+        oldProcess.sessionId = session.sessionId;
+        gameInfoUpdated({
+          gameInfo: oldProcess,
+          runningChanged: true,
+        });
+      });
+    }
+  }
+
+  otherGameProcesses = newProcesses;
 }
 
 const ignoredOWProcesses = ["game.exe", "nw.exe"];
