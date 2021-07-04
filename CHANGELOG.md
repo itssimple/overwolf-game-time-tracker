@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.4.1...v1.5.0) (2021-07-04)
+
+
+### Features
+
+* Support for multiple running games at the same time (timing will look.. funny though) ([5370e5e](https://github.com/itssimple/overwolf-game-time-tracker/commit/5370e5eab7b89c63cabc90e7b5abd5aa7a5948a7))
+
+
+### Bug Fixes
+
+* Changed so that the text for no current games is the same as initially. ([cf2bb9e](https://github.com/itssimple/overwolf-game-time-tracker/commit/cf2bb9eb476e0e17c9cfcc5946f6fd954ae30449))
+
 ### [1.4.1](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.4.0...v1.4.1) (2021-06-26)
 
 
