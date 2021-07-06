@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.1](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.5.0...v1.5.1) (2021-07-06)
+
+
+### Bug Fixes
+
+* Added extra check for OW and GTT processes, in case they contain a path and not just executable name. ([5eb587e](https://github.com/itssimple/overwolf-game-time-tracker/commit/5eb587e343e14635f6b62e662116126b027622cc))
+
 ## [1.5.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.4.1...v1.5.0) (2021-07-04)
 
 

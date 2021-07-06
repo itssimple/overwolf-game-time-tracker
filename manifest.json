@@ -76,7 +76,9 @@
         "include_launchers": true
       }
     ],
-    "game_events": [10902],
+    "game_events": [
+      10902
+    ],
     "disable_dt": true,
     "developer": {
       "enable_auto_refresh": true,
@@ -89,5 +91,6 @@
         "class": "GameTimeTracker.GameDetector.GameDetectorPlugin"
       }
     }
-  }
+  },
+  "version": "1.5.1"
 }
