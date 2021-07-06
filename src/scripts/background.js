@@ -82,6 +82,8 @@ function gameLaunched(game) {
     if (window.possibleGameName && window.possibleGameName != null) {
       game.title = window.possibleGameName;
       log("GAME:TITLE", "Custom title", game.title);
+
+      window.possibleGameName = null;
     }
 
     log("GAME:LAUNCH", game);
@@ -448,11 +450,15 @@ function isOwSupportedGame(path) {
     .flatMap((item) => item)
     .find((item) => {
       for (let process of item.processNames) {
-        if (process.indexOf(executable) === 0) {
+        if (
+          process.indexOf(executable) === 0 ||
+          process.indexOf(`\\${executable}`) > -1
+        ) {
+          log("OW:GAME", item);
           return true;
         }
+        return false;
       }
-      return false;
     });
 }
 
@@ -460,7 +466,10 @@ function isGTTSupportedGame(path) {
   let executable = path.substr(path.lastIndexOf("\\") + 1);
   return gameDetector.GameInfo.map((item) => item).find((item) => {
     for (let proc of item.ProcessNames) {
-      if (executable.indexOf(proc) === 0) {
+      if (
+        proc.indexOf(executable) === 0 ||
+        proc.indexOf(`\\${executable}`) > -1
+      ) {
         return true;
       }
       return false;
