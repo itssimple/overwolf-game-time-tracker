@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.5.1...v1.6.0) (2021-07-12)
+
+
+### Features
+
+* Ignore Overwolf-events in case of some games are doubly tracked. ([da65383](https://github.com/itssimple/overwolf-game-time-tracker/commit/da653837ef38322f47ffb8f80878b02ffcd314dd)), closes [#12](https://github.com/itssimple/overwolf-game-time-tracker/issues/12)
+
+
+### Bug Fixes
+
+* Implemented code to handle "Relaunch"-menu item ([e22f470](https://github.com/itssimple/overwolf-game-time-tracker/commit/e22f470c91be0f6870e80bbb258d25f461ce8932))
+
 ### [1.5.1](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.5.0...v1.5.1) (2021-07-06)
 
 
