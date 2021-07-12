@@ -298,6 +298,16 @@ function exitApp(reason) {
 function toggleExperimentalGameDetection() {
   db.getSettings((settings) => {
     clearInterval(gameDetectorGameInfoUpdater);
+    clearInterval(gameDetectorGameSessionDetector);
+
+    overwolf.games.onGameLaunched.removeListener(gameLaunched);
+    overwolf.games.onGameInfoUpdated.removeListener(gameInfoUpdated);
+
+    if (settings.ignoreOverwolf == undefined || !settings.ignoreOverwolf) {
+      overwolf.games.onGameLaunched.addListener(gameLaunched);
+      overwolf.games.onGameInfoUpdated.addListener(gameInfoUpdated);
+    }
+
     if (settings && settings.experimentalGameTracking) {
       log("GAMEDETECTOR", "Enabling background updates");
       gameDetectorGameInfoUpdater = setInterval(function () {
@@ -309,7 +319,8 @@ function toggleExperimentalGameDetection() {
           if (processes) {
             checkInterestingProcesses(
               processes.InterestingApplications,
-              settings.sendPossibleGameData
+              settings.sendPossibleGameData,
+              settings.ignoreOverwolf
             );
           }
         });
@@ -323,7 +334,11 @@ function toggleExperimentalGameDetection() {
 let sentSuggestionsThisSession = [];
 var otherGameProcesses = [];
 
-function checkInterestingProcesses(processList, sendPossibleGameData) {
+function checkInterestingProcesses(
+  processList,
+  sendPossibleGameData,
+  ignoreOverwolf
+) {
   let previousProcesses = [...otherGameProcesses];
 
   let newProcesses = [];
@@ -345,7 +360,10 @@ function checkInterestingProcesses(processList, sendPossibleGameData) {
         }
 
         let owSupport = isOwSupportedGame(process.Application.ProcessPath);
-        if (owSupport && owSupport.injectionDecision !== "Supported") {
+        if (
+          owSupport &&
+          (owSupport.injectionDecision !== "Supported" || ignoreOverwolf)
+        ) {
           otherGameProcess = {
             classId: owSupport.classId,
             title: owSupport.gameTitle,
@@ -604,12 +622,6 @@ if (firstLaunch) {
 
   overwolf.extensions.onAppLaunchTriggered.removeListener(openWindow);
   overwolf.extensions.onAppLaunchTriggered.addListener(openWindow);
-
-  overwolf.games.onGameLaunched.removeListener(gameLaunched);
-  overwolf.games.onGameLaunched.addListener(gameLaunched);
-
-  overwolf.games.onGameInfoUpdated.removeListener(gameInfoUpdated);
-  overwolf.games.onGameInfoUpdated.addListener(gameInfoUpdated);
 
   overwolf.games.launchers.events.onInfoUpdates.removeListener(
     launcherInfoUpdates
