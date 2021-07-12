@@ -64,6 +64,9 @@ overwolf.os.tray.onMenuItemClicked.addListener((event) => {
     case "open_gtt_mainWindow":
       openWindow(null, "tray_menu");
       break;
+    case "relaunch_gtt":
+      relaunchTheApp();
+      break;
     case "exit_gtt":
       exitApp("Clicked exit-menu item");
       break;
