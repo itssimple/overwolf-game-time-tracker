@@ -332,6 +332,10 @@ function loadSettings() {
           "settingsAutomaticSendPossibleGame"
         ).checked = true;
       }
+
+      if (_settings.ignoreOverwolf) {
+        document.getElementById("settingsIgnoreOverwolf").checked = true;
+      }
     }
   });
 }
@@ -419,6 +423,20 @@ eventEmitter.addEventListener(
         db.setSettings(
           {
             sendPossibleGameData: sendPossibleGame,
+          },
+          function () {
+            eventEmitter.emit("settings-changed");
+          }
+        );
+      });
+
+    document
+      .getElementById("settingsIgnoreOverwolf")
+      .addEventListener("change", function (event) {
+        let ignoreOverwolf = event.target.checked;
+        db.setSettings(
+          {
+            ignoreOverwolf: ignoreOverwolf,
           },
           function () {
             eventEmitter.emit("settings-changed");

@@ -213,6 +213,10 @@ function GameTimeTrackerDatabase() {
             settingsObject.sendPossibleGameData;
         }
 
+        if (settingsObject.ignoreOverwolf !== undefined) {
+          updateSession.ignoreOverwolf = settingsObject.ignoreOverwolf;
+        }
+
         cursor.update(updateSession);
       }
     };
