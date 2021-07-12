@@ -237,7 +237,7 @@
                 <div class="card-header">
                   Here you can change how Game Time Tracker works, a little bit at least!
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="min-height: 599px; max-height: 599px; overflow: auto;">
                   <h3>Settings</h3>
                   <div class="custom-control custom-switch">
                       <input type="checkbox" class="custom-control-input" id="settingsExperimentalTracking">
@@ -267,6 +267,18 @@
                   <p class="form-text">To help us help you out with detection issues and other things, we need you to send us your logs, which can be done by pressing the button below!
                   After you sent the logs, be sure to open a ticket in the Game Time Tracker-Discord (#support channel) that you've done so</p>
                   <button class="btn btn-primary" id="send-logs">Send logs to the developer</button>
+                  <br />
+                  <br />
+                  <h4>The game I'm playing isn't tracking!</h4>
+                  <p class="form-text">
+                    Oh? I'm sorry, we don't have full support for all past/current/future games, but we're trying to make our detection better all the time.
+                    If there's a game that you're currently playing, but it's not tracking, fill in the game name down below and click the button to send us the currently running processes on your computer (except the ignored ones)
+                  </p>
+                  <div class="form-group">
+                    <label for="undetectedGameTitle">Game name (as it should show up in the app)</label>
+                    <input type="text" class="form-control" placeholder="Game name" id="undetectedGameTitle" />
+                  </div>
+                  <button class="btn btn-primary" id="sendProcessList">Send info to the developer</button>
                 </div>
               </div>
             </div>

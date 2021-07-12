@@ -13,6 +13,8 @@ const eventEmitter = backgroundWindow.eventEmitter;
 /** @type GameTimeTrackerDatabase */
 const db = backgroundWindow.db;
 
+const gameDetector = backgroundWindow.gameDetector;
+
 var activeGameTicker = null;
 
 var overwolfAdvertiseObject = null;
@@ -449,7 +451,6 @@ eventEmitter.addEventListener(
       logButton.innerText = "Uploading logs, please wait ...";
       logButton.disabled = true;
       overwolf.utils.uploadClientLogs(function () {
-        // TODO: Show a message that the logs were uploaded
         logButton.innerText = "Logs sent, thank you";
         setTimeout(function () {
           logButton.innerText = "Send logs to the developer";
@@ -457,6 +458,32 @@ eventEmitter.addEventListener(
         }, 5000);
       });
     });
+
+    document
+      .getElementById("sendProcessList")
+      .addEventListener("click", function () {
+        let processButton = document.getElementById("sendProcessList");
+        processButton.innerText = "Uploading process list, please wait ...";
+        processButton.disabled = true;
+
+        gameDetector.CheckProcesses((processInfo) => {
+          for (let proc of processInfo.OtherApplications) {
+            gameDetector.SendProcessListItem(
+              `${document.getElementById("undetectedGameTitle").value} (${
+                proc.WindowTitle
+              })`,
+              proc.ProcessClassName,
+              proc.ProcessPath
+            );
+          }
+
+          processButton.innerText = "Process list sent, thank you";
+          setTimeout(function () {
+            processButton.innerText = "Send info to the developer";
+            processButton.disabled = false;
+          }, 5000);
+        });
+      });
   });
 
   localStorage.setItem("mainWindow_opened", true);
