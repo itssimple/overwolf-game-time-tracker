@@ -97,15 +97,15 @@ function loadLatestSessions() {
         if (rowCount < 10) {
           let row = document.createElement("tr");
           row.innerHTML = `
-        <td>${shorten(session.gameTitle, 40)}</td>
+        <td>${session.gameTitle}</td>
         <td class="text-right" style="width: 150px;">${formatTimespan(
           session.startDate,
           session.endDate,
           latestSession
         )}</td>
-        <td class="text-center" style="width: 120px;">${formatDate(
-          new Date(session.startDate)
-        )}</td>`;
+        <td class="text-center" style="width: 120px;" title="${new Date(
+          session.startDate
+        ).toISOString()}">${formatDate(new Date(session.startDate))}</td>`;
 
           gameSessionTable.appendChild(row);
           latestSession = false;
@@ -391,15 +391,15 @@ function sendProcessListToDeveloper() {
           })`,
           proc.ProcessClassName,
           proc.ProcessPath
-            );
-          }
+        );
+      }
 
       processButton.innerText = "Process list sent, thank you";
       setTimeout(function () {
         processButton.innerText = "Send info to the developer";
         processButton.disabled = false;
       }, 5000);
-      });
+    });
   };
 }
 
@@ -419,34 +419,34 @@ function sendLogsToDeveloper() {
 }
 
 function bindIgnoreOverwolfEventsEvent() {
-    document
+  document
     .getElementById("settingsIgnoreOverwolf")
-      .addEventListener("change", function (event) {
+    .addEventListener("change", function (event) {
       let ignoreOverwolf = event.target.checked;
-        db.setSettings(
-          {
+      db.setSettings(
+        {
           ignoreOverwolf: ignoreOverwolf,
-          },
-          function () {
-            eventEmitter.emit("settings-changed");
-          }
-        );
-      });
+        },
+        function () {
+          eventEmitter.emit("settings-changed");
+        }
+      );
+    });
 }
 
 function bindSendDetectedPossibleGameEvent() {
-    document
-      .getElementById("settingsAutomaticSendPossibleGame")
-      .addEventListener("change", function (event) {
-        let sendPossibleGame = event.target.checked;
-        db.setSettings(
-          {
-            sendPossibleGameData: sendPossibleGame,
-          },
-          function () {
-            eventEmitter.emit("settings-changed");
-          }
-        );
+  document
+    .getElementById("settingsAutomaticSendPossibleGame")
+    .addEventListener("change", function (event) {
+      let sendPossibleGame = event.target.checked;
+      db.setSettings(
+        {
+          sendPossibleGameData: sendPossibleGame,
+        },
+        function () {
+          eventEmitter.emit("settings-changed");
+        }
+      );
     });
 }
 
@@ -460,26 +460,26 @@ function bindExitButtonEvent(window) {
           "No running game while clicking exit button"
         );
       }
-      });
+    });
 
     overwolf.windows.close(window.window.id, function () {});
   });
 }
 
 function bindExperimentalTrackingEvent() {
-    document
+  document
     .getElementById("settingsExperimentalTracking")
-      .addEventListener("change", function (event) {
+    .addEventListener("change", function (event) {
       let experimentalEnabled = event.target.checked;
-        db.setSettings(
-          {
+      db.setSettings(
+        {
           experimentalGameTracking: experimentalEnabled,
-          },
-          function () {
-            eventEmitter.emit("settings-changed");
-          }
-        );
-      });
+        },
+        function () {
+          eventEmitter.emit("settings-changed");
+        }
+      );
+    });
 }
 
 (function () {
