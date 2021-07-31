@@ -377,47 +377,64 @@ eventEmitter.addEventListener(
   }
 );
 
-(function () {
-  loadSettings();
-  loadLatestSessions();
+function sendProcessListToDeveloper() {
+  return function () {
+    let processButton = document.getElementById("sendProcessList");
+    processButton.innerText = "Uploading process list, please wait ...";
+    processButton.disabled = true;
 
-  overwolf.windows.getCurrentWindow(function (window) {
-    new DraggableWindow(window.window, document.getElementById("titleBar"));
-    document
-      .getElementById("exitButton")
-      .addEventListener("click", function () {
-        localStorage.removeItem("mainWindow_opened");
-        overwolf.games.getRunningGameInfo(function (data) {
-          if (!data) {
-            eventEmitter.emit(
-              "shutdown",
-              "No running game while clicking exit button"
+    gameDetector.CheckProcesses((processInfo) => {
+      for (let proc of processInfo.OtherApplications) {
+        gameDetector.SendProcessListItem(
+          `${document.getElementById("undetectedGameTitle").value} (${
+            proc.WindowTitle
+          })`,
+          proc.ProcessClassName,
+          proc.ProcessPath
             );
           }
-        });
 
-        overwolf.windows.close(window.window.id, function () {});
+      processButton.innerText = "Process list sent, thank you";
+      setTimeout(function () {
+        processButton.innerText = "Send info to the developer";
+        processButton.disabled = false;
+      }, 5000);
       });
+  };
+}
 
-    overwolf.extensions.current.getManifest(function (app) {
-      windowTitle = `Game Time Tracker - v${app.meta.version}`;
-      document.getElementById("titleBarName").innerHTML = windowTitle;
+function sendLogsToDeveloper() {
+  return function () {
+    let logButton = document.getElementById("send-logs");
+    logButton.innerText = "Uploading logs, please wait ...";
+    logButton.disabled = true;
+    overwolf.utils.uploadClientLogs(function () {
+      logButton.innerText = "Logs sent, thank you";
+      setTimeout(function () {
+        logButton.innerText = "Send logs to the developer";
+        logButton.disabled = false;
+      }, 5000);
     });
+  };
+}
 
+function bindIgnoreOverwolfEventsEvent() {
     document
-      .getElementById("settingsExperimentalTracking")
+    .getElementById("settingsIgnoreOverwolf")
       .addEventListener("change", function (event) {
-        let experimentalEnabled = event.target.checked;
+      let ignoreOverwolf = event.target.checked;
         db.setSettings(
           {
-            experimentalGameTracking: experimentalEnabled,
+          ignoreOverwolf: ignoreOverwolf,
           },
           function () {
             eventEmitter.emit("settings-changed");
           }
         );
       });
+}
 
+function bindSendDetectedPossibleGameEvent() {
     document
       .getElementById("settingsAutomaticSendPossibleGame")
       .addEventListener("change", function (event) {
@@ -430,60 +447,65 @@ eventEmitter.addEventListener(
             eventEmitter.emit("settings-changed");
           }
         );
+    });
+}
+
+function bindExitButtonEvent(window) {
+  document.getElementById("exitButton").addEventListener("click", function () {
+    localStorage.removeItem("mainWindow_opened");
+    overwolf.games.getRunningGameInfo(function (data) {
+      if (!data) {
+        eventEmitter.emit(
+          "shutdown",
+          "No running game while clicking exit button"
+        );
+      }
       });
 
+    overwolf.windows.close(window.window.id, function () {});
+  });
+}
+
+function bindExperimentalTrackingEvent() {
     document
-      .getElementById("settingsIgnoreOverwolf")
+    .getElementById("settingsExperimentalTracking")
       .addEventListener("change", function (event) {
-        let ignoreOverwolf = event.target.checked;
+      let experimentalEnabled = event.target.checked;
         db.setSettings(
           {
-            ignoreOverwolf: ignoreOverwolf,
+          experimentalGameTracking: experimentalEnabled,
           },
           function () {
             eventEmitter.emit("settings-changed");
           }
         );
       });
+}
 
-    document.getElementById("send-logs").addEventListener("click", function () {
-      let logButton = document.getElementById("send-logs");
-      logButton.innerText = "Uploading logs, please wait ...";
-      logButton.disabled = true;
-      overwolf.utils.uploadClientLogs(function () {
-        logButton.innerText = "Logs sent, thank you";
-        setTimeout(function () {
-          logButton.innerText = "Send logs to the developer";
-          logButton.disabled = false;
-        }, 5000);
-      });
+(function () {
+  loadSettings();
+  loadLatestSessions();
+
+  overwolf.windows.getCurrentWindow(function (window) {
+    new DraggableWindow(window.window, document.getElementById("titleBar"));
+    bindExitButtonEvent(window);
+
+    overwolf.extensions.current.getManifest(function (app) {
+      windowTitle = `Game Time Tracker - v${app.meta.version}`;
+      document.getElementById("titleBarName").innerHTML = windowTitle;
     });
+
+    bindExperimentalTrackingEvent();
+    bindSendDetectedPossibleGameEvent();
+    bindIgnoreOverwolfEventsEvent();
+
+    document
+      .getElementById("send-logs")
+      .addEventListener("click", sendLogsToDeveloper);
 
     document
       .getElementById("sendProcessList")
-      .addEventListener("click", function () {
-        let processButton = document.getElementById("sendProcessList");
-        processButton.innerText = "Uploading process list, please wait ...";
-        processButton.disabled = true;
-
-        gameDetector.CheckProcesses((processInfo) => {
-          for (let proc of processInfo.OtherApplications) {
-            gameDetector.SendProcessListItem(
-              `${document.getElementById("undetectedGameTitle").value} (${
-                proc.WindowTitle
-              })`,
-              proc.ProcessClassName,
-              proc.ProcessPath
-            );
-          }
-
-          processButton.innerText = "Process list sent, thank you";
-          setTimeout(function () {
-            processButton.innerText = "Send info to the developer";
-            processButton.disabled = false;
-          }, 5000);
-        });
-      });
+      .addEventListener("click", sendProcessListToDeveloper);
   });
 
   localStorage.setItem("mainWindow_opened", true);
