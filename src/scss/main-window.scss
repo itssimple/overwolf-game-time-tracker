@@ -1,31 +1,6 @@
-:root {
-  --default-backgroundcolor: #515960;
-  --darker-background: #272b30;
-}
-
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-  background: transparent;
-}
-
-::-webkit-scrollbar-track,
-::-webkit-scrollbar-corner {
-  background: var(--darker-background);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--default-backgroundcolor);
-}
-
 #main-win-container {
   overflow-y: scroll;
   max-height: 682px;
-}
-
-body {
-  height: 100vh;
-  overflow: hidden;
 }
 
 .desktop {
@@ -75,28 +50,8 @@ body {
   stroke: var(--default-backgroundcolor) !important;
 }
 
-* {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Old versions of Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
-}
-
-.navbar {
-  padding-left: unset;
-  padding-right: 1rem;
-  background-color: var(--default-backgroundcolor) !important;
-}
-
 .fade {
   transition: opacity 0.08s;
-}
-
-.custom-control-input:checked ~ .custom-control-label::before {
-  background-color: #000;
 }
 
 .chartist-tooltip {
@@ -115,18 +70,9 @@ body {
   }
 }
 
-h1 {
-  font-size: 1.9rem;
-}
-
-h2 {
-  font-size: 1.7rem;
-}
-
-h3 {
-  font-size: 1.3rem;
-}
-
-h4 {
-  font-size: 1.1rem;
+#last10Sessions table td {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
