@@ -73,14 +73,26 @@ overwolf.os.tray.onMenuItemClicked.addListener((event) => {
   }
 });
 
-var backgroundGameUpdater = null;
+var backgroundGameUpdater = {};
 
 var gameDetectorGameInfoUpdater = null;
 var gameDetectorGameSessionDetector = null;
 
 var appUpdateCheck = null;
 
-function gameLaunched(game) {
+function startTimerForSession(sessionId) {
+  if (backgroundGameUpdater[sessionId] != null) {
+    clearInterval(backgroundGameUpdater[sessionId]);
+  }
+
+  backgroundGameUpdater[sessionId] = setInterval(function () {
+    window.db.updateGameSessionBySessionId(sessionId, {
+      endDate: Date.now(),
+    });
+  }, 10000);
+}
+
+function gameLaunched(game, emitEvent = true) {
   if (game) {
     if (window.possibleGameName && window.possibleGameName != null) {
       game.title = window.possibleGameName;
@@ -89,14 +101,12 @@ function gameLaunched(game) {
       window.possibleGameName = null;
     }
 
+    if (emitEvent) {
     log("GAME:LAUNCH", game);
     eventEmitter.emit("game-launched", game);
+    }
 
-    backgroundGameUpdater = setInterval(function () {
-      window.db.updateGameSessionBySessionId(game.sessionId, {
-        endDate: Date.now(),
-      });
-    }, 10000);
+    startTimerForSession(game.sessionId);
   }
 }
 
@@ -110,8 +120,8 @@ function gameInfoUpdated(game) {
     log("GAME:UPDATE", game);
     eventEmitter.emit("game-exited", game);
 
-    clearInterval(backgroundGameUpdater);
-    backgroundGameUpdater = null;
+    clearInterval(backgroundGameUpdater[game.gameInfo.sessionId]);
+    backgroundGameUpdater[game.gameInfo.sessionId] = null;
   }
 }
 
