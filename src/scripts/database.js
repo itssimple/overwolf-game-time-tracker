@@ -133,38 +133,42 @@ function GameTimeTrackerDatabase() {
       if (cursor) {
         const updateSession = cursor.value;
 
-        if (sessionData.endDate) {
+        if (typeof sessionData.endDate != "undefined") {
           updateSession.endDate = sessionData.endDate;
         }
 
-        if (sessionData.gameClass) {
+        if (typeof sessionData.gameClass != "undefined") {
           updateSession.gameClass = sessionData.gameClass;
         }
 
-        if (sessionData.gameTitle) {
+        if (typeof sessionData.gameTitle != "undefined") {
           updateSession.gameTitle = sessionData.gameTitle;
         }
 
-        if (sessionData.startDate) {
+        if (typeof sessionData.startDate != "undefined") {
           updateSession.startDate = sessionData.startDate;
         }
 
-        if (sessionData.isGame) {
+        if (typeof sessionData.isGame != "undefined") {
           updateSession.isGame = sessionData.isGame;
         }
 
-        if (sessionData.isPossibleGame) {
+        if (typeof sessionData.isPossibleGame != "undefined") {
           updateSession.isPossibleGame = sessionData.isPossibleGame;
         }
 
-        if (sessionData.sessionEnded) {
+        if (typeof sessionData.sessionEnded != "undefined") {
           updateSession.sessionEnded = sessionData.sessionEnded;
+        }
+
+        if (typeof sessionData.processId != "undefined") {
+          updateSession.processId = sessionData.processId;
         }
 
         cursor.update(updateSession);
 
         if (updateComplete) {
-          updateComplete();
+          updateComplete(updateSession);
         }
 
         return;
