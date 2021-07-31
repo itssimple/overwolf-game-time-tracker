@@ -70,26 +70,39 @@ function GameTimeTrackerDatabase() {
         isGame: isGame,
         isPossibleGame: isPossibleGame,
         sessionEnded: false,
+        processId: gameInfo.processId,
       });
   };
 
-  this.getGameSessionByClassId = function (classId, resultCallback) {
-    this.DBInstance.transaction("gameSessions", "readwrite")
-      .objectStore("gameSessions")
-      .index("by_gameclass")
-      .openCursor(IDBKeyRange.only(classId), "prev").onsuccess = function (
-      event
-    ) {
-      var cursor = event.target.result;
+  this.getGameSessionByClassIdAndProcessId = function (
+    classId,
+    processId,
+    filterFunction
+  ) {
+    let _dbInstance = this.DBInstance;
+    return new Promise(function (resolve, reject) {
+      _dbInstance
+        .transaction("gameSessions", "readwrite")
+        .objectStore("gameSessions")
+        .index("by_gameclass")
+        .openCursor(IDBKeyRange.only(classId), "prev").onsuccess = function (
+        event
+      ) {
+        var cursor = event.target.result;
 
-      if (cursor) {
-        if (cursor.value) {
-          resultCallback(cursor.value);
-          return;
+        if (cursor) {
+          if (cursor.value && cursor.value.processId == processId) {
+            if (filterFunction(cursor.value)) {
+              resolve(cursor.value);
+              return;
+            }
+          }
+          cursor.continue();
         }
-        cursor.continue();
-      }
-    };
+
+        resolve(null);
+      };
+    });
   };
 
   this.getGameSessionByUnendedSessionAndClass = function (
