@@ -102,8 +102,8 @@ function gameLaunched(game, emitEvent = true) {
     }
 
     if (emitEvent) {
-    log("GAME:LAUNCH", game);
-    eventEmitter.emit("game-launched", game);
+      log("GAME:LAUNCH", game);
+      eventEmitter.emit("game-launched", game);
     }
 
     startTimerForSession(game.sessionId);
@@ -325,9 +325,9 @@ function toggleExperimentalGameDetection() {
       }, 600000);
 
       gameDetectorGameSessionDetector = setInterval(function () {
-        gameDetector.CheckProcesses((processes) => {
+        gameDetector.CheckProcesses(async (processes) => {
           if (processes) {
-            checkInterestingProcesses(
+            await checkInterestingProcesses(
               processes.InterestingApplications,
               settings.sendPossibleGameData,
               settings.ignoreOverwolf
@@ -344,7 +344,7 @@ function toggleExperimentalGameDetection() {
 let sentSuggestionsThisSession = [];
 var otherGameProcesses = [];
 
-function checkInterestingProcesses(
+async function checkInterestingProcesses(
   processList,
   sendPossibleGameData,
   ignoreOverwolf
@@ -355,6 +355,7 @@ function checkInterestingProcesses(
   if (processList && processList.length > 0) {
     for (let process of processList) {
       if (process.Application) {
+        let processId = process.Application.ProcessId;
         let gttGame = isGTTSupportedGame(process.Application.ProcessPath);
         if (gttGame) {
           otherGameProcess = {
@@ -363,6 +364,7 @@ function checkInterestingProcesses(
             isGame: true,
             isPossibleGame: true,
             sessionId: null,
+            processId: processId,
           };
 
           newProcesses.push(otherGameProcess);
@@ -380,6 +382,7 @@ function checkInterestingProcesses(
             isGame: true,
             isPossibleGame: true,
             sessionId: null,
+            processId: processId,
           };
 
           newProcesses.push(otherGameProcess);
@@ -399,6 +402,7 @@ function checkInterestingProcesses(
               isGame: false,
               isPossibleGame: true,
               sessionId: null,
+              processId: processId,
             };
 
             newProcesses.push(otherGameProcess);
@@ -434,6 +438,34 @@ function checkInterestingProcesses(
     previousProcesses = previousProcesses.filter(
       (item) => item.classId != otherGameProcess.classId
     );
+
+    let possibleOldProcess = await db.getGameSessionByClassIdAndProcessId(
+      otherGameProcess.classId,
+      otherGameProcess.processId,
+      (gameSession) => {
+        return (
+          gameSession.sessionEnded &&
+          (gameSession.endDate - gameSession.startDate) / 1000 < 300
+        );
+      }
+    );
+
+    if (possibleOldProcess != null) {
+      previousProcesses = previousProcesses.filter(
+        (item) =>
+          item.classId != possibleOldProcess.classId &&
+          item.processId != possibleOldProcess.processId
+      );
+
+      otherGameProcess.sessionId = possibleOldProcess.sessionId;
+
+      window.db.updateGameSessionBySessionId(possibleOldProcess.sessionId, {
+        sessionEnded: false,
+      });
+
+      gameLaunched(otherGameProcess);
+    }
+
     getOpenGameSessions(otherGameProcess.classId, (openSession) => {
       if (!openSession) {
         // Create new session
