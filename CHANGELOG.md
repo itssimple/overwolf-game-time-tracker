@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.7.0...v1.8.0) (2021-07-31)
+
+
+### Features
+
+* Added tooltip for session start column with date as ISO string ([317246d](https://github.com/itssimple/overwolf-game-time-tracker/commit/317246d9a5e70eacbcaaf2df346335f3f908faea))
+* Fixed so that we can track a session in case of our plugin losing track of it, by checking process ID as well ([0aa727d](https://github.com/itssimple/overwolf-game-time-tracker/commit/0aa727dcdaace3b075c73b69c0d8f9a62eb73dce))
+* New plugin that exposes ProcessId so we can match against that one too for continued sessions ([f8fcdaf](https://github.com/itssimple/overwolf-game-time-tracker/commit/f8fcdafa834b9b8714f89b33653a1a94379ced6d))
+* Sending processId for new sessions, added method to search for class and processId ([16e0fd4](https://github.com/itssimple/overwolf-game-time-tracker/commit/16e0fd4d60bf1d06f7f9dc3c9983fa0d17417d44))
+
+
+### Bug Fixes
+
+* Fixed issue with not being able to set certain properties because javascript.. ([5696093](https://github.com/itssimple/overwolf-game-time-tracker/commit/569609305b18fbb0f5a210a54f0f70ddb18f2c6d))
+* Remove double database-load ([5a7f795](https://github.com/itssimple/overwolf-game-time-tracker/commit/5a7f7958647b9ac45b4973f18ef4fb3ad41b0891))
+
 ## [1.7.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.6.0...v1.7.0) (2021-07-12)
 
 
