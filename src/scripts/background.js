@@ -356,7 +356,7 @@ async function checkInterestingProcesses(
     for (let process of processList) {
       if (process.Application) {
         let processId = process.Application.ProcessId;
-        let gttGame = isGTTSupportedGame(process.Application.ProcessPath);
+        let gttGame = isGTTSupportedGame(process.Application);
         if (gttGame) {
           otherGameProcess = {
             classId: `gtt-${gttGame.Id}`,
@@ -371,7 +371,7 @@ async function checkInterestingProcesses(
           continue;
         }
 
-        let owSupport = isOwSupportedGame(process.Application.ProcessPath);
+        let owSupport = isOwSupportedGame(process.Application);
         if (
           owSupport &&
           (owSupport.injectionDecision !== "Supported" || ignoreOverwolf)
@@ -502,7 +502,11 @@ async function checkInterestingProcesses(
 
 const ignoredOWProcesses = ["game.exe", "nw.exe"];
 
-function isOwSupportedGame(path) {
+function isOwSupportedGame(application) {
+  const path = application.ProcessPath;
+  const windowTitle = application.WindowTitle;
+  const processClassName = application.ProcessClassName;
+
   let executable = path.substr(path.lastIndexOf("\\") + 1);
 
   if (ignoredOWProcesses.includes(executable.toLowerCase())) {
@@ -512,10 +516,12 @@ function isOwSupportedGame(path) {
   return owSupportedGames
     .flatMap((item) => item)
     .find((item) => {
-      for (let process of item.processNames) {
+      for (let proc of item.processNames) {
         if (
-          process.indexOf(executable) === 0 ||
-          process.indexOf(`\\${executable}`) > -1
+          path.indexOf(proc) > -1 ||
+          (!ignoredOWProcesses.includes(executable.toLowerCase()) &&
+            (proc.indexOf(executable) === 0 ||
+              proc.indexOf(`\\${executable}`) > -1))
         ) {
           log("OW:GAME", item);
           return true;
@@ -525,14 +531,31 @@ function isOwSupportedGame(path) {
     });
 }
 
-function isGTTSupportedGame(path) {
+function isGTTSupportedGame(application) {
+  const path = application.ProcessPath;
+  const windowTitle = application.WindowTitle;
+  const processClassName = application.ProcessClassName;
+
   let executable = path.substr(path.lastIndexOf("\\") + 1);
   return gameDetector.GameInfo.map((item) => item).find((item) => {
     for (let proc of item.ProcessNames) {
       if (
+        path.indexOf(proc) > -1 ||
         proc.indexOf(executable) === 0 ||
         proc.indexOf(`\\${executable}`) > -1
       ) {
+        if (proc.WindowClass) {
+          if (proc.WindowClass == processClassName) {
+            return true;
+          }
+
+          if (proc.WindowTitle && proc.WindowTitle == windowTitle) {
+            return true;
+          }
+
+          return false;
+        }
+
         return true;
       }
       return false;
