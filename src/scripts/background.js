@@ -541,8 +541,9 @@ function isGTTSupportedGame(application) {
     for (let proc of item.ProcessNames) {
       if (
         path.indexOf(proc) > -1 ||
-        proc.indexOf(executable) === 0 ||
-        proc.indexOf(`\\${executable}`) > -1
+        (!ignoredOWProcesses.includes(executable.toLowerCase()) &&
+          (proc.indexOf(executable) === 0 ||
+            proc.indexOf(`\\${executable}`) > -1))
       ) {
         if (proc.WindowClass) {
           if (proc.WindowClass == processClassName) {
