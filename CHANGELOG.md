@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.1](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.8.0...v1.8.1) (2021-09-10)
+
+
+### Bug Fixes
+
+* Better process detection, but not 100% perfect yet ([5e966e0](https://github.com/itssimple/overwolf-game-time-tracker/commit/5e966e0a3b47555e944155591a9d068fc1e075e1))
+
 ## [1.8.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.7.0...v1.8.0) (2021-07-31)
 
 
