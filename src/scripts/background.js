@@ -410,6 +410,11 @@ async function checkInterestingProcesses(
             if (
               !sentSuggestionsThisSession.includes(otherGameProcess.classId)
             ) {
+              let processPathCleaner = process.Application.ProcessPath.replace(
+                /\\Users\\(.*?)\\/g,
+                "\\Users\\{userAccount}\\"
+              );
+
               log(
                 "GAME-SUGGESTION",
                 "Sending game data to backend database",
@@ -422,7 +427,7 @@ async function checkInterestingProcesses(
                 process.Application.WindowTitle,
                 executable,
                 process.Application.ProcessClassName,
-                process.Application.ProcessPath
+                processPathCleaner
               );
               sentSuggestionsThisSession.push(otherGameProcess.classId);
 
