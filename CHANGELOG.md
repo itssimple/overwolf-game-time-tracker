@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.8.3...v1.9.0) (2021-11-04)
+
+
+### Features
+
+* Added export method, to export all playtime-data ([b30b129](https://github.com/itssimple/overwolf-game-time-tracker/commit/b30b129d10ce865e1ededf132722c53330b6912d))
+
 ### [1.8.3](https://github.com/itssimple/overwolf-game-time-tracker/compare/v1.8.2...v1.8.3) (2021-09-12)
 
 
