@@ -500,12 +500,46 @@ function bindExperimentalTrackingEvent() {
     bindIgnoreOverwolfEventsEvent();
 
     document
-      .getElementById("send-logs")
-      .addEventListener("click", sendLogsToDeveloper);
+      .getElementById("export-data")
+      .addEventListener("click", function () {
+        var selectedExportPath;
+        overwolf.utils.openFolderPicker(overwolf.io.paths.desktop, (path) => {
+          if (path.success) {
+            selectedExportPath = path.path;
+            db.getSessions((sessions) => {
+              let csvLines = [];
 
-    document
-      .getElementById("sendProcessList")
-      .addEventListener("click", sendProcessListToDeveloper);
+              const headerItems = Object.keys(sessions[0]);
+
+              csvLines.push(headerItems.map(JSON.stringify).join(","));
+              sessions.map((session) => {
+                csvLines.push(
+                  headerItems
+                    .map((item) =>
+                      JSON.stringify(session[item], function (key, value) {
+                        console.log(item, key, value);
+                        if (item == "startDate" || item == "endDate") {
+                          return new Date(value).toISOString();
+                        }
+                        return value ? value.toString() : "";
+                      })
+                    )
+                    .join(",")
+                );
+              });
+
+              overwolf.io.writeFileContents(
+                `${selectedExportPath}/game-time-tracker-data.csv`,
+                csvLines.join("\r\n"),
+                overwolf.io.enums.eEncoding.UTF8,
+                true,
+                console.log
+              );
+            });
+          } else {
+          }
+        });
+      });
   });
 
   localStorage.setItem("mainWindow_opened", true);
